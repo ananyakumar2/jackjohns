@@ -1,12 +1,16 @@
 import { DoubleSide, Mesh, PlaneGeometry, ShaderMaterial, Vector3 } from 'three';
 import { ROOM_GLSL } from './room.js';
 import { DISPLAY_GLSL } from './palette.js';
-import { ARC } from './layout.js';
+import { ARC, CAMERA_Y, CAMERA_Z, HELMET_VISUAL_RADIUS, OPENING } from './layout.js';
 import { REFLECT_LAYER } from './stage.js';
 import { PLANE_VERT, Spring } from './cards.js';
 
 const SIDE = (ARC.count - 1) / 2;
 const STEP = ARC.span / SIDE;
+// sized at its own depth so on screen it is concentric with the opening
+const DEPTH_K = (CAMERA_Z - ARC.z) / CAMERA_Z;
+const R = ARC.r * HELMET_VISUAL_RADIUS * DEPTH_K;
+const CENTRE_Y = CAMERA_Y + (-OPENING.drop * HELMET_VISUAL_RADIUS - CAMERA_Y) * DEPTH_K;
 const _f = new Vector3();
 
 // The shift light, curved under the helmet like a smile. It fills from the
@@ -24,8 +28,8 @@ export function createArc(room, exposure) {
     uIdle: { value: 0 },
     uPlane: { value: new Vector3() },
   };
-  const w = 2 * ARC.radius * Math.sin(ARC.span) + 0.8;
-  const h = ARC.radius * (1 - Math.cos(ARC.span)) + 0.8;
+  const w = 2 * R * Math.sin(ARC.span) + 0.8;
+  const h = R * (1 - Math.cos(ARC.span)) + 0.8;
   const mesh = new Mesh(
     new PlaneGeometry(1, 1),
     new ShaderMaterial({
@@ -46,7 +50,7 @@ export function createArc(room, exposure) {
         varying vec3 vB;
         varying vec3 vN;
 
-        const float R = ${ARC.radius.toFixed(4)};
+        const float R = ${R.toFixed(4)};
         const float STEP = ${STEP.toFixed(5)};
         const float LED = ${ARC.led.toFixed(4)};
         const float SIDE = ${SIDE.toFixed(1)};
@@ -118,9 +122,10 @@ export function createArc(room, exposure) {
     }),
   );
   mesh.layers.enable(REFLECT_LAYER);
-  mesh.position.set(0, -ARC.radius + h / 2 - 0.4, ARC.z);
+  const offset = -R + h / 2 - 0.4;
+  mesh.position.set(0, CENTRE_Y + offset, ARC.z);
   mesh.scale.set(w, h, 1);
-  uniforms.uPlane.value.set(w, h, mesh.position.y);
+  uniforms.uPlane.value.set(w, h, offset);
 
   const left = new Spring(13, 0.42);
   const right = new Spring(13, 0.42);

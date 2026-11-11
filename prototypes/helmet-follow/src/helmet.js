@@ -114,6 +114,7 @@ function createShellMaterial(livery, logo, logoSize, nodeMatrix, room) {
   // metallic blue paint under a clear coat: the flake catches the studio, the coat mirrors the room
   const m = new MeshPhysicalMaterial({
     map: livery,
+    color: new Color(1.14, 1.2, 1.3),
     roughness: 0.34,
     metalness: 0.62,
     clearcoat: 1,

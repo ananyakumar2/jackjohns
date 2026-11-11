@@ -1,6 +1,6 @@
 # Redline: hero design
 
-The Jack Johns hero. A real-time racing helmet looks at the cursor from the middle of a dark stage. Around it, four framed cards hold the pillars (Sim Racing, Racing, Commentating, Coaching). Heat haze trails the cursor, a shift-light arc under the helmet fills towards the card it faces, and a small Book pill opens a lens of availability.
+The Jack Johns hero. A real-time racing helmet looks at the cursor from the middle of a dark stage, with his name above it. Around it, four framed cards hold the pillars (Sim Racing, Racing, Commentating, Coaching) and together make a square with a round opening for the helmet. Heat haze trails the cursor, a shift-light arc in the opening under the helmet fills towards the card it faces, and a small Book pill under the square opens a lens of availability.
 
 The helmet, livery, logo, clips and availability are placeholders. There is no back end.
 
@@ -31,29 +31,30 @@ These URL parameters are for testing and are off by default:
 ## What it does
 
 - **Stage.** A night pit garage: a wall in Jack's blue in deep shade, a soft light pool behind the helmet, and a wet floor that reflects the cards, the arc and the pill with a streaky, patchy smear. The wall picks up the colour of the card that's awake.
-- **Cards.** Four framed cards with real gaps and a silver chrome bezel. At rest each one is a cool desaturated still, all brought to one brightness so they read as a set. Hovering wakes a card into full-colour footage with a small overshoot. Leaving freezes it on its current frame and lets the colour drain. Cards lean towards the cursor (the hovered one most), and a fast flick knocks them so they wobble and ring out. The only words are the pillar names.
+- **Name.** "Jack Johns" over the square, in the site's type at a larger size. It is silver with a faint chrome sheen from the shared studio room, so its highlight slides a little as the helmet turns. It is drawn into the canvas (so the haze bends it), with a transparent `h1` on top for selection and screen readers.
+- **Cards.** Four square cards that fill a square around the helmet, each with its inner corner cut on one circle round the helmet, so the four read as one frame with a round opening. Each keeps its own silver chrome bezel, which follows the cut, with clear gutters between them. At rest each one is a cool desaturated still, all brought to one brightness so they read as a set. Hovering wakes a card into full-colour footage with a small overshoot. Leaving freezes it on its current frame and lets the colour drain. Cards lean towards the cursor (the hovered one most), and a fast flick knocks them so they wobble and ring out. The only other words are the pillar names: beside the square's outer corners on wide screens, above and below it on narrow ones.
 - **Helmet.** The motion is unchanged from the prototype: look-at with a spring, roll into turns, two-speed lean, idle float, drag to spin 360°. It is about 18 % smaller. The visor reflects the stage and the cards, desaturated at rest and in colour when awake. The trim is environment-mapped silver chrome.
 - **Heat haze** over the whole hero, in the same WebGL canvas. A lagging head chases the cursor and stamps a small velocity and density field, which drifts, blurs and fades at a fixed 60 Hz. One full-screen pass bends the finished frame with it.
   - Strongest over the footage, light over the stage, quiet over the helmet, and gone about a second after the cursor stops.
   - Where the wake folds over, it catches the light like liquid chrome: only bright reflections show, so it glints rather than fogs. A flick at the limiter turns the glints gold.
   - A faint thin-film fringe runs gold, silver and blue, the colours heat leaves on titanium.
-- **Shift-light arc.** Fifteen chrome-cupped LEDs under the helmet, glowing in Jack's blue. They fill from the centre towards the side the helmet faces, kick past and settle when the faced card changes, sweep once on arrival, and flash gold three times at redline (a flick over 2,600 px/s). With nobody steering, only the centre LED breathes. It is a curve that fills by amount, never a row that counts down, so it can't read as start lights.
-- **Book.** One small pill under the arc. The helmet's gaze pre-selects the pillar. Clicking fills the pill with liquid chrome from the side the cursor came in, then opens a lens around the helmet: Jesper's lens without the black disc. The rim bends the page around it, the inside is smoked glass, and the pillar name and six placeholder slots sit on top. Picking a slot fills it with blue from the entry point. Esc, a click outside or Book again closes it. On narrow screens it shows four slots in one column.
+- **Shift-light arc.** Fifteen chrome-cupped LEDs in the gap between the helmet's chin and the cards, following the opening's curve, glowing in Jack's blue. They fill from the centre towards the side the helmet faces, kick past and settle when the faced card changes, sweep once on arrival, and flash gold three times at redline (a flick over 2,600 px/s). With nobody steering, only the centre LED breathes. It is a curve that fills by amount, never a row that counts down, so it can't read as start lights.
+- **Book.** One small pill under the square, centred below the gutter between the bottom cards. The helmet's gaze pre-selects the pillar. Clicking fills the pill with liquid chrome from the side the cursor came in, then opens a lens around the helmet: Jesper's lens without the black disc. The rim bends the page around it, the inside is smoked glass, and the pillar name and six placeholder slots sit on top. Picking a slot fills it with blue from the entry point. Esc, a click outside or Book again closes it. On narrow screens it shows four slots in one column.
 - **Touch.** With nothing awake, the head looks at each card in turn. A tap wakes a card and turns the head, a finger drag leaves haze, and phone tilt steers the head (not yet tried on a real phone).
 - **Reduced motion.** No haze, no overshoot, roll, float, card lean or wobble, and the arc stays at its dim centre LED. The look-at, the card wake and the lens stay.
 - **Credits.** A small "Credits" toggle in the bottom-left corner carries the attribution the CC BY and CC BY-SA licences require.
 
 ## Look
 
-**Palette.** Taken from Jack: the blue of his Supra, and the silver and gold chrome of his liveries and wheels. Chrome is the signature, and it's real environment-mapped metal everywhere (card bezels, arc LEDs, pill rim and ink, helmet trim, haze glints), all lit by one shared studio environment that turns a little with the helmet, so every highlight slides when the head moves. Blue is the anchor in measured doses: the helmet, the lit LEDs and a picked slot. The stage is Jack's blue in deep shade (`#10131a`), not black, so the chrome has something cool to reflect. There is no red, black-and-red, off-white or orange, and no chequered flags, stripes or carbon fibre.
+**Palette.** Taken from Jack: the blue of his Supra, and the silver and gold chrome of his liveries and wheels. Chrome is the signature, and it's real environment-mapped metal everywhere (card bezels, arc LEDs, pill rim and ink, helmet trim, haze glints), all lit by one shared studio environment that turns a little with the helmet, so every highlight slides when the head moves. Blue is the anchor in measured doses: the helmet, the lit LEDs and a picked slot. The stage is Jack's blue in deep shade (`#131821`), not black, so the chrome has something cool to reflect. There is no red, black-and-red, off-white or orange, and no chequered flags, stripes or carbon fibre.
 
 | | Linear RGB | Use |
 | --- | --- | --- |
-| Stage | 0.0046, 0.0055, 0.0082 (`#10131a`) | Wall, floor, lens glass |
-| Jack's blue | 0.03, 0.20, 1.0 | LED glow, helmet; `#2f66e0` for a picked slot |
+| Stage | 0.0105, 0.0121, 0.0170 (`#131821`) | Wall, floor, lens glass |
+| Jack's blue | 0.045, 0.24, 1.0 | LED glow, helmet; `#2f66e0` for a picked slot |
 | Silver chrome | F0 0.90, 0.92, 0.95 | Bezels, trim, rims, glints |
 | Gold chrome | F0 1.0, 0.77, 0.36 | Redline flash, flick glints |
-| Type | `#c6ced9` | Names, Book, slots |
+| Type | `#c6ced9` | Name, pillar names, Book, slots |
 
 **Typeface.** Archivo Expanded SemiBold (Omnibus-Type, SIL Open Font License), self-hosted as one 14 KB WOFF2. It is wide, low-contrast and engineered, like the lettering on a car badge or a dash, so the names feel automotive without an icon. It is set uppercase at 11.5 px with 0.18 em tracking. Inter, Roboto and the system defaults would make it look like an app.
 
@@ -90,7 +91,7 @@ Everything Jack's team replaces lives in `public/content/`. Nothing in `src/` ne
 
 - `still` is the card's resting image, and the page reveals as soon as the four stills are in. It's a frame from the clip for now, and can later be an anime still. Any WebP, JPG or PNG works. About 1280×720 at WebP quality 80 is 15–50 KB.
 - `stillAt` is the time in seconds where the clip is parked, so waking a card continues from the still. Use the time the still was taken from (or 0 for a still that isn't a frame).
-- `focus` is the point of the clip, from 0 to 1, that stays in view when a card crops it.
+- `focus` is the point of the clip, from 0 to 1, that stays in view when a card crops it. Cards are square and lose their inner corner to the opening, so put the subject towards the card's outer side (left for the left-hand cards, right for the right-hand ones).
 
 **What Jack should deliver.**
 - **Clips:** one per pillar, 1920×1080 or larger, landscape, 25–60 fps, 4–6 s of continuous action that can loop, no burned-in text or letterboxing, H.264 at a high bitrate or ProRes 422. We encode each to 1280×720 H.264 (CRF 24, 1 s keyframes, `+faststart`, no audio) with `scripts/encode-clips.sh`, about 0.3–1 MB each.

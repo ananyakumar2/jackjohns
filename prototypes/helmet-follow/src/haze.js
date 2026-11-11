@@ -1,6 +1,7 @@
 import { BufferGeometry, Float32BufferAttribute, HalfFloatType, LinearFilter, Mesh, OrthographicCamera, Scene, ShaderMaterial, Vector2, Vector3, Vector4, WebGLRenderTarget } from 'three';
 import { ROOM_GLSL } from './room.js';
 import { DISPLAY_GLSL } from './palette.js';
+import { OPENING } from './layout.js';
 
 const FIELD = 256;
 const SIM_HZ = 60;
@@ -108,6 +109,7 @@ float hazeMask(vec2 px) {
   for (int k = 0; k < 4; k++) {
     vec4 r = uCards[k];
     float d = sdBox(px - (r.xy + r.zw) * 0.5, (r.zw - r.xy) * 0.5);
+    d = max(d, uHelmet.z * ${OPENING.r.toFixed(2)} - length(px - uHelmet.xy + vec2(0.0, uHelmet.z * ${OPENING.drop.toFixed(2)})));
     float c = 1.0 - smoothstep(-8.0, 16.0, d);
     onCard = max(onCard, c);
     m = max(m, c * (0.75 + 0.25 * uWake[k]));

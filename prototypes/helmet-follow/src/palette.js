@@ -6,9 +6,9 @@
 // Linear RGB for shaders; the CSS values are the same colours for the DOM.
 
 export const PALETTE = {
-  stage: [0.0046, 0.0055, 0.0082],
-  stageLift: [0.0058, 0.0082, 0.0155],
-  blue: [0.03, 0.2, 1.0],
+  stage: [0.0105, 0.0121, 0.017],
+  stageLift: [0.0075, 0.0107, 0.0202],
+  blue: [0.045, 0.24, 1.0],
   blueCore: [0.62, 0.82, 1.0],
   silver: [0.9, 0.92, 0.95],
   gold: [1.0, 0.77, 0.36],
@@ -18,7 +18,7 @@ export const PALETTE = {
 };
 
 export const CSS = {
-  stage: '#10131a',
+  stage: '#131821',
   type: '#c6ced9',
   typeDim: 'rgba(198, 206, 217, 0.62)',
   blue: '#3f7bff',

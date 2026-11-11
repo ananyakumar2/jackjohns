@@ -4,11 +4,12 @@ import { createRoomUniforms, REST_LEVEL, ROOM_DEPTH, ROOM_LY } from './room.js';
 import { createStudioEnvironment, HELMET_RADIUS, loadHelmet, HELMET_SCALE } from './helmet.js';
 import { HeadMotion } from './motion.js';
 import { downloadSplit, Governor, Hud } from './perf.js';
-import { CAMERA_Y, CAMERA_Z, CARD_Z, FOV, PILL, WALL_Z, cardAt, computeLayout, createView, viewTan } from './layout.js';
+import { CAMERA_Y, CAMERA_Z, CARD_Z, FOV, FRAME_PX, PILL, TITLE, WALL_Z, cardAt, computeLayout, createView, viewTan } from './layout.js';
 import { createStage } from './stage.js';
-import { Card, FRAME_PX, updateCards } from './cards.js';
+import { Card, updateCards } from './cards.js';
 import { createArc } from './arc.js';
-import { createNames, createTextAtlas } from './labels.js';
+import { createNames, createTextAtlas, createTitle } from './labels.js';
+import { CSS } from './palette.js';
 import { createBooking } from './booking.js';
 import { createHaze } from './haze.js';
 
@@ -61,6 +62,9 @@ scene.add(arc.mesh);
 
 const atlas = await createTextAtlas([...pillars.map((p) => p.name), 'Book']);
 const names = createNames(atlas, pillars.map((p) => p.name), [0.776, 0.808, 0.851], stageExposure);
+const titleEl = document.getElementById('title');
+const title = createTitle(await createTextAtlas([titleEl.textContent], TITLE), titleEl.textContent, room, stageExposure);
+names.scene.add(title.mesh);
 const booking = createBooking({
   room,
   exposure: stageExposure,
@@ -154,8 +158,16 @@ function resize() {
   sceneRT.setSize(pw, ph);
   stage.resize(pw, ph);
   stage.layout(layout, camera);
-  cards.forEach((c, i) => c.place(layout.cards[i], view));
+  cards.forEach((c, i) => c.place(layout.cards[i], view, layout.open));
   names.layout(view, layout);
+  title.layout(layout);
+  Object.assign(titleEl.style, {
+    left: `${title.box.x}px`,
+    top: `${title.box.y}px`,
+    width: `${title.box.w}px`,
+    lineHeight: `${title.box.h}px`,
+    fontSize: `${layout.title.size}px`,
+  });
   booking.layout(view, layout);
   haze.resize(w, h);
 
@@ -208,7 +220,7 @@ function frame(now) {
 function render(now) {
   stage.reflect(renderer, scene, camera, front);
   renderer.setRenderTarget(sceneRT);
-  renderer.setClearColor(0x10131a, 1);
+  renderer.setClearColor(CSS.stage, 1);
   renderer.clear(true, true, false);
   renderer.render(scene, camera);
   renderer.render(names.scene, names.camera);

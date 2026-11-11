@@ -7,7 +7,7 @@
 }
 
 :root {
-  --stage: #10131a;
+  --stage: #131821;
   --type: #c6ced9;
   --type-dim: rgb(198 206 217 / 0.32);
   --blue: #2f66e0;
@@ -48,6 +48,18 @@ body {
 #pillars {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+}
+
+#title {
+  position: absolute;
+  margin: 0;
+  font: var(--type-font);
+  letter-spacing: 0.22em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
   pointer-events: none;
 }
 
@@ -235,7 +247,7 @@ body.grabbing #gl {
   margin: 0 0 10px;
   padding: 12px 14px;
   list-style: none;
-  background: rgb(16 19 26 / 0.92);
+  background: rgb(19 24 33 / 0.92);
   border: 1px solid var(--type-dim);
   border-radius: 10px;
 }

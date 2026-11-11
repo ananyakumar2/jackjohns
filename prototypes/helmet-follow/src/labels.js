@@ -1,4 +1,6 @@
-import { CanvasTexture, LinearFilter, Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Vector3, Vector4 } from 'three';
+import { CanvasTexture, LinearMipmapLinearFilter, Mesh, OrthographicCamera, PlaneGeometry, Scene, ShaderMaterial, Vector3, Vector4 } from 'three';
+import { ROOM_GLSL } from './room.js';
+import { DISPLAY_GLSL } from './palette.js';
 
 export const FONT_FAMILY = '"Archivo Expanded"';
 export const TYPE = { size: 11.5, tracking: 0.18, weight: 600 };
@@ -7,14 +9,14 @@ const SS = 4; // atlas supersampling
 // Words are drawn into the canvas, not just laid over it, so the heat haze
 // bends them along with everything else (Colombel's trick). Transparent DOM
 // text sits on top for selection, find-in-page and screen readers.
-export async function createTextAtlas(words) {
-  await document.fonts.load(`${TYPE.weight} ${TYPE.size}px ${FONT_FAMILY}`).catch(() => {});
-  const px = TYPE.size * SS;
-  const font = `${TYPE.weight} ${px}px ${FONT_FAMILY}, sans-serif`;
+export async function createTextAtlas(words, type = TYPE) {
+  await document.fonts.load(`${type.weight} ${type.size}px ${FONT_FAMILY}`).catch(() => {});
+  const px = type.size * SS;
+  const font = `${type.weight} ${px}px ${FONT_FAMILY}, sans-serif`;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   ctx.font = font;
-  const track = TYPE.tracking * px;
+  const track = type.tracking * px;
   const lineH = Math.ceil(px * 1.5);
   const measure = (s) => [...s].reduce((w, ch) => w + ctx.measureText(ch).width + track, -track);
   const widths = words.map((w) => Math.ceil(measure(w.toUpperCase())) + 8);
@@ -39,9 +41,69 @@ export async function createTextAtlas(words) {
     };
   });
   const texture = new CanvasTexture(canvas);
-  texture.minFilter = LinearFilter;
-  texture.generateMipmaps = false;
-  return { texture, entries };
+  texture.minFilter = LinearMipmapLinearFilter;
+  texture.anisotropy = 4;
+  return { texture, entries, size: type.size };
+}
+
+// His name over the square: the site's type, filled silver, with a chrome
+// sheen from the shared studio room, so its horizon line slides a little as
+// the helmet turns. The silver base keeps every letter readable whatever the
+// reflection is doing.
+export function createTitle(atlas, word, room, exposure) {
+  const e = atlas.entries[word];
+  const uniforms = {
+    ...room,
+    uAtlas: { value: atlas.texture },
+    uRect: { value: e.uv },
+    uExposure: exposure,
+  };
+  const mesh = new Mesh(
+    new PlaneGeometry(1, 1),
+    new ShaderMaterial({
+      uniforms,
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+      `,
+      fragmentShader: /* glsl */ `
+        ${ROOM_GLSL}
+        ${DISPLAY_GLSL}
+        uniform sampler2D uAtlas;
+        uniform vec4 uRect;
+        uniform float uExposure;
+        varying vec2 vUv;
+        void main() {
+          float a = texture2D(uAtlas, mix(uRect.xy, uRect.zw, vUv)).a;
+          if (a <= 0.0) discard;
+          // letters read as slightly convex top to bottom, so they pick up sky, horizon and floor
+          float gy = (vUv.y - 0.5) / 0.26;
+          vec3 N = normalize(vec3((vUv.x - 0.5) * 0.35, gy * 0.42, 1.0));
+          vec3 R = reflect(vec3(0.0, 0.0, -1.0), N);
+          vec3 sheen = toDisplay(chromeEnv(vec3(0.0, 2.6, 0.5), R, 0.02, 0.3) * uExposure);
+          vec3 base = vec3(0.776, 0.808, 0.851) * mix(0.72, 0.9, smoothstep(-1.0, 1.0, gy));
+          gl_FragColor = vec4(min(base + sheen * 0.42, vec3(1.0)), a * uExposure);
+        }
+      `,
+      transparent: true,
+      depthTest: false,
+      depthWrite: false,
+    }),
+  );
+  return {
+    mesh,
+    box: null,
+    layout(layout) {
+      const s = layout.title.size / atlas.size;
+      const w = e.w * s;
+      const h = e.h * s;
+      const x = Math.round(layout.title.x - w / 2);
+      const y = Math.round(layout.title.y - h / 2);
+      mesh.scale.set(w, h, 1);
+      mesh.position.set(x + w / 2, -(y + h / 2), 0);
+      this.box = { x, y, w, h };
+    },
+  };
 }
 
 // Pillar names, in screen space, drawn after the 3D scene.

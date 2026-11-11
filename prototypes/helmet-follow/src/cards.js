@@ -1,12 +1,12 @@
-import { DoubleSide, Mesh, PlaneGeometry, ShaderMaterial, Vector2 } from 'three';
+import { DoubleSide, Mesh, PlaneGeometry, ShaderMaterial, Vector2, Vector3 } from 'three';
 import { ROOM_GLSL } from './room.js';
 import { DISPLAY_GLSL } from './palette.js';
-import { CARD_Z } from './layout.js';
+import { CARD_Z, FRAME_PX } from './layout.js';
 import { REFLECT_LAYER } from './stage.js';
 
-export const FRAME_PX = 4.5;
 const RADIUS_PX = 9;
 const PAD_PX = 2;
+const NOTCH_SOFT_PX = 14;
 
 // Damped spring, substepped so stiff settings stay stable at 30 Hz.
 export class Spring {
@@ -71,6 +71,7 @@ uniform vec2 uFocus;
 uniform vec2 uSizePx;
 uniform float uWake;
 uniform float uStillGain;
+uniform vec3 uNotch; // centre (card px, y up) and radius of the circle the inner corner follows
 uniform float uExposure;
 varying vec2 vUv;
 varying vec3 vWorld;
@@ -82,7 +83,12 @@ void main() {
   vec2 full = uSizePx + 2.0 * (${FRAME_PX.toFixed(2)} + ${PAD_PX.toFixed(2)});
   vec2 p = (vUv - 0.5) * full;
   vec2 hs = uSizePx * 0.5;
-  float dIn = sdRound(p, hs, ${RADIUS_PX.toFixed(2)});
+  // rounded rect minus the opening, joined by a smooth max so the cut meets the edges with a fillet
+  float dRect = sdRound(p, hs, ${RADIUS_PX.toFixed(2)});
+  vec2 toC = p - uNotch.xy;
+  float dCut = uNotch.z + ${FRAME_PX.toFixed(2)} - length(toC);
+  float hk = clamp(0.5 + 0.5 * (dCut - dRect) / ${NOTCH_SOFT_PX.toFixed(1)}, 0.0, 1.0);
+  float dIn = mix(dRect, dCut, hk) + ${NOTCH_SOFT_PX.toFixed(1)} * hk * (1.0 - hk);
   float aa = max(length(fwidth(p)) * 0.7, 0.35);
   float cover = 1.0 - smoothstep(-aa, aa, dIn - ${FRAME_PX.toFixed(2)});
   if (cover <= 0.0) discard;
@@ -106,7 +112,7 @@ void main() {
 
   // silver chrome bezel: a half-round bead, lit by the same room as the visor
   float b = clamp(dIn / ${FRAME_PX.toFixed(2)}, 0.0, 1.0) * 2.0 - 1.0;
-  vec2 dir = sdRoundDir(p, hs, ${RADIUS_PX.toFixed(2)});
+  vec2 dir = normalize(mix(sdRoundDir(p, hs, ${RADIUS_PX.toFixed(2)}), -toC / max(length(toC), 1e-3), hk));
   vec3 nl = normalize(vec3(dir * b * 1.3, sqrt(max(1.0 - b * b, 0.03))));
   vec3 N = normalize(nl.x * vT + nl.y * vB + nl.z * vN);
   float spread = length(fwidth(N)) + 0.004;
@@ -129,6 +135,7 @@ export class Card {
       uSizePx: { value: new Vector2(320, 200) },
       uWake: { value: 0 },
       uStillGain: { value: 1 },
+      uNotch: { value: new Vector3(0, 0, -1e4) },
     };
     this.mesh = new Mesh(
       new PlaneGeometry(1, 1),
@@ -144,11 +151,14 @@ export class Card {
     this.rect = { x: 0, y: 0, w: 1, h: 1 };
   }
 
-  place(rect, view) {
+  place(rect, view, open) {
     this.rect = rect;
-    const [x, y] = view.toWorld(rect.x + rect.w / 2, rect.y + rect.h / 2, CARD_Z);
+    const cx = rect.x + rect.w / 2;
+    const cy = rect.y + rect.h / 2;
+    const [x, y] = view.toWorld(cx, cy, CARD_Z);
     this.base = { x, y, wpx: view.pxToWorld(CARD_Z) };
     this.uniforms.uSizePx.value.set(rect.w, rect.h);
+    this.uniforms.uNotch.value.set(open.x - cx, cy - open.y, open.r);
     this.apply();
   }
 
