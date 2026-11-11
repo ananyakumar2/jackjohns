@@ -52,6 +52,9 @@ const room = createRoomUniforms();
 const scene = new Scene();
 scene.environment = createStudioEnvironment(renderer);
 
+// a clip can bind while the fonts are still loading; the loop only starts once the page is laid out
+let raf = 0;
+let live = false;
 const clips = createClips(pillars, base, (clip) => bindClip(clip), { manual: !!capture });
 const stage = createStage(view, stageExposure);
 scene.add(...stage.meshes);
@@ -132,7 +135,6 @@ let helmetShown = false;
 let entryStart = 0;
 let entry = 0;
 let active = -1;
-let raf = 0;
 let lastFrame = 0;
 let wasBusy = false;
 const pointer = { x: 0, y: 0, inside: false };
@@ -175,7 +177,7 @@ function resize() {
     const el = nameEls[i];
     el.style.left = `${n.x}px`;
     el.style.top = `${n.y}px`;
-    el.style.transform = `translate(${n.align === 'right' ? '-100%' : '0'}, ${n.base === 'bottom' ? '-100%' : '0'})`;
+    el.style.transform = `translate(${n.align === 'right' ? '-100%' : '0'}, ${n.base === 'middle' ? '-50%' : n.base === 'bottom' ? '-100%' : '0'})`;
   });
 
   room.uRoom.value.set(ROOM_LY * view.aspect, ROOM_LY, ROOM_LY * ROOM_DEPTH);
@@ -190,12 +192,13 @@ function resize() {
   wake();
 }
 addEventListener('resize', resize);
+live = true;
 resize();
 
 // ---------- render on demand ----------
 
 function wake() {
-  if (!raf && !capture) raf = requestAnimationFrame(frame);
+  if (!raf && !capture && live) raf = requestAnimationFrame(frame);
 }
 
 function frame(now) {

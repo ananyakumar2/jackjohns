@@ -164,7 +164,7 @@ export function createNames(atlas, names, colour, exposure) {
       items.forEach((it, i) => {
         const n = layout.names[i];
         const x = n.align === 'right' ? n.x - it.w / 2 + 4 : n.x + it.w / 2 - 4;
-        const y = n.base === 'bottom' ? n.y - it.h / 2 : n.y + it.h / 2;
+        const y = n.base === 'middle' ? n.y : n.base === 'bottom' ? n.y - it.h / 2 : n.y + it.h / 2;
         it.mesh.scale.set(it.w, it.h, 1);
         it.mesh.position.set(Math.round(x), -Math.round(y), 0);
         it.box = { x: x - it.w / 2, y: y - it.h / 2, w: it.w, h: it.h };

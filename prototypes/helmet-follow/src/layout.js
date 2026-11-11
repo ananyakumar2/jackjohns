@@ -51,11 +51,11 @@ export function createView() {
   };
 }
 
-// The helmet sits at the centre of the screen inside a square of four cards,
-// each with its inner corner cut on one circle round the helmet. His name is
-// above the square and Book below it, so the three stack centred together.
-// Wide screens put the pillar names beside the outer corners; narrow ones
-// above and below the square.
+// The helmet sits at the centre of the screen inside a 2×2 grid of cards, each
+// with its inner corner cut on one circle round the helmet. His name is above
+// the grid and Book below it. On wide screens the grid runs the full width
+// between them, and the pillar names share those two rows at the grid's outer
+// edges; narrow screens keep a square grid with the names above and below it.
 export function computeLayout(view) {
   const { W, H, aspect } = view;
   const [hx, hy] = view.toScreen(0, 0, 0);
@@ -68,36 +68,40 @@ export function computeLayout(view) {
   const gap = wide ? 26 : 16;
   const nameRow = wide ? 0 : 24;
   const my = Math.max(24, H * 0.03);
-  const mx = wide ? 190 : Math.max(W * 0.04, 12);
+  const mx = wide ? Math.max(32, W * 0.028) : Math.max(W * 0.04, 12);
   const above = titleH + gap + nameRow;
   const below = nameRow + gap + PILL.h;
-  const half = Math.min(hy - my - above, H - hy - my - below, W / 2 - mx);
+  let half = Math.min(hy - my - above, H - hy - my - below);
+  let halfW = W / 2 - mx;
+  if (!wide) half = halfW = Math.min(half, halfW);
   const G = wide ? 18 : Math.max(8, W * 0.025);
-  const cw = half - G / 2 - 2 * F;
-  const x0 = hx - half + F;
+  const cw = halfW - G / 2 - 2 * F;
+  const ch = half - G / 2 - 2 * F;
+  const x0 = hx - halfW + F;
   const x1 = hx + G / 2 + F;
   const y0 = hy - half + F;
   const y1 = hy + G / 2 + F;
   const cards = [
-    { x: x0, y: y0, w: cw, h: cw },
-    { x: x1, y: y0, w: cw, h: cw },
-    { x: x0, y: y1, w: cw, h: cw },
-    { x: x1, y: y1, w: cw, h: cw },
+    { x: x0, y: y0, w: cw, h: ch },
+    { x: x1, y: y0, w: cw, h: ch },
+    { x: x0, y: y1, w: cw, h: ch },
+    { x: x1, y: y1, w: cw, h: ch },
   ];
 
+  const titleY = hy - half - nameRow - gap - titleH / 2;
+  const pill = { x: hx, y: hy + half + nameRow + gap + PILL.h / 2, w: PILL.w, h: PILL.h };
   const names = cards.map((c, i) => {
     const right = i % 2 === 1;
     const top = i < 2;
-    if (wide) {
-      return { x: right ? c.x + c.w + F + 18 : c.x - F - 18, y: top ? c.y - F - 4 : c.y + c.h + F + 4, align: right ? 'left' : 'right', base: top ? 'top' : 'bottom' };
-    }
-    return { x: right ? c.x + c.w + F : c.x - F, y: top ? c.y - F - 6 : c.y + c.h + F + 6, align: right ? 'right' : 'left', base: top ? 'bottom' : 'top' };
+    const x = right ? c.x + c.w + F : c.x - F;
+    const align = right ? 'right' : 'left';
+    if (wide) return { x, y: top ? titleY : pill.y, align, base: 'middle' };
+    return { x, y: top ? c.y - F - 6 : c.y + c.h + F + 6, align, base: top ? 'bottom' : 'top' };
   });
 
-  // The floor sits just under the square, so the cards hang above the wet tarmac.
+  // The floor sits just under the grid, so the cards hang above the wet tarmac.
   const floorY = Math.min(-2.5, view.toWorld(0, hy + half, CARD_Z)[1] - 0.12);
 
-  const pill = { x: hx, y: hy + half + nameRow + gap + PILL.h / 2, w: PILL.w, h: PILL.h };
   const lensR = Math.min(Math.max(helmetR * 1.62, 150), W * 0.44, H * 0.3);
   // rides up if needed so its rim stays clear of the Book pill, which closes it
   const lensY = Math.min(hy + helmetR * 0.08, pill.y - PILL.h / 2 - 14 - lensR);
@@ -105,7 +109,7 @@ export function computeLayout(view) {
     cards,
     names,
     floorY,
-    title: { x: hx, y: hy - half - nameRow - gap - titleH / 2, size: titleSize },
+    title: { x: hx, y: titleY, size: titleSize },
     open: { x: hx, y: hy + helmetR * OPENING.drop, r: helmetR * OPENING.r },
     helmet: { x: hx, y: hy, r: helmetR },
     pill,
