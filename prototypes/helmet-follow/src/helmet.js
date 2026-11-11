@@ -9,6 +9,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshPhysicalMaterial,
+  MeshStandardMaterial,
   PlaneGeometry,
   PMREMGenerator,
   Scene,
@@ -22,13 +23,14 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { ROOM_GLSL, ROOM_LY, ROOM_DEPTH, SOFTBOXES } from './room.js';
+import { DISPLAY_GLSL, PALETTE, patchDisplay } from './palette.js';
 
 // Helmet-space anchors (the build centres the shell at the origin, visor on +z).
 const NECK_PIVOT = new Vector3(0, -0.95, -0.35);
 const LOGO_CENTRE = new Vector2(0, -0.22);
 // The source model is posed chin-up; this levels it so the neutral pose looks straight out.
 const REST_PITCH = MathUtils.degToRad(24);
-export const HELMET_SCALE = 1.22;
+export const HELMET_SCALE = 1.0;
 export const HELMET_RADIUS = 1.3 * HELMET_SCALE;
 
 let ktx2;
@@ -53,7 +55,7 @@ function loadTexture(url, renderer) {
   });
 }
 
-export async function loadHelmet(renderer, config, base, room) {
+export async function loadHelmet(renderer, config, base, room, exposure) {
   const url = (p) => new URL(p, base).href;
   const { gltf: gltfLoader } = loaders(renderer);
   const [gltf, livery, logo] = await Promise.all([
@@ -76,12 +78,12 @@ export async function loadHelmet(renderer, config, base, room) {
 
   const shell = parts.Shell;
   shell.material = createShellMaterial(livery, logo, config.logoSize ?? 0.62, shell.matrixWorld.clone(), room);
-  parts.Visor.material = createVisorMaterial(room);
-
-  const trim = parts.Trim.material;
-  trim.envMapIntensity = 1.1;
+  parts.Visor.material = createVisorMaterial(room, exposure);
+  const trimMR = parts.Trim.material.metalnessMap;
+  parts.Trim.material = createChromeMaterial(room);
   parts.Padding.material.envMapIntensity = 0.4;
   parts.Vents.material.envMapIntensity = 1.4;
+  for (const name of ['Shell', 'Trim', 'Padding', 'Vents']) patchDisplay(parts[name].material, exposure);
 
   // look-at rotates about the neck; drag-spin rotates about the helmet's centre
   const rig = new Group();
@@ -104,18 +106,19 @@ export async function loadHelmet(renderer, config, base, room) {
     rest,
     pivot,
     parts,
-    textures: [livery, logo, trim.metalnessMap].filter(Boolean),
+    textures: [livery, logo, trimMR].filter(Boolean),
   };
 }
 
 function createShellMaterial(livery, logo, logoSize, nodeMatrix, room) {
+  // metallic blue paint under a clear coat: the flake catches the studio, the coat mirrors the room
   const m = new MeshPhysicalMaterial({
     map: livery,
-    roughness: 0.36,
-    metalness: 0,
+    roughness: 0.34,
+    metalness: 0.62,
     clearcoat: 1,
     clearcoatRoughness: 0.035,
-    envMapIntensity: 1.7,
+    envMapIntensity: 1.5,
   });
   const uniforms = {
     ...room,
@@ -189,11 +192,12 @@ function createShellMaterial(livery, logo, logoSize, nodeMatrix, room) {
 
 // Smoked iridium visor: opaque, dark behind, a Fresnel-weighted mirror of the
 // room in front, with a slight thin-film hue shift towards grazing angles.
-function createVisorMaterial(room) {
+function createVisorMaterial(room, exposure) {
   return new ShaderMaterial({
     uniforms: {
       ...room,
-      uInterior: { value: new Color(0.0045, 0.005, 0.0062) },
+      uExposure: exposure,
+      uInterior: { value: new Color(0.0035, 0.0048, 0.0085) },
       uF0: { value: 0.3 },
       uGain: { value: 2.6 },
       uStrip: { value: 0.16 },
@@ -210,6 +214,8 @@ function createVisorMaterial(room) {
     `,
     fragmentShader: /* glsl */ `
       ${ROOM_GLSL}
+      ${DISPLAY_GLSL}
+      uniform float uExposure;
       uniform vec3 uInterior;
       uniform float uF0;
       uniform float uGain;
@@ -229,24 +235,50 @@ function createVisorMaterial(room) {
 
         vec3 env = roomRadiance(vWorldPos, R, spread, 0.0, uStrip);
         float F = uF0 + (1.0 - uF0) * pow(1.0 - NdV, 5.0);
-        vec3 film = mix(vec3(0.84, 0.9, 1.0), vec3(1.0, 0.9, 0.78), smoothstep(0.25, 0.95, 1.0 - NdV));
+        // iridium film: cool face-on, a touch of gold chrome at grazing angles
+        vec3 film = mix(vec3(0.8, 0.88, 1.0), vec3(1.0, 0.9, 0.7), smoothstep(0.3, 0.95, 1.0 - NdV));
 
-        gl_FragColor = vec4(uInterior * (1.0 - F) + env * F * film * uGain, 1.0);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
+        gl_FragColor = vec4(toDisplay((uInterior * (1.0 - F) + env * F * film * uGain) * uExposure), 1.0);
       }
     `,
   });
 }
 
-// A custom studio for the shell's base layer and the trim: dark walls, the
-// same softboxes the analytic room has, and four dim panels where the clips
+// Silver chrome for the trim (spoiler, vent caps): a mirror of the same room,
+// so it carries the cards and the strip lights like the visor does.
+function createChromeMaterial(room) {
+  const m = new MeshStandardMaterial({ color: new Color(...PALETTE.silver), metalness: 1, roughness: 0.12, envMapIntensity: 1 });
+  m.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, room);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>
+        varying vec3 vRoomPos;`)
+      .replace('#include <project_vertex>', `#include <project_vertex>
+        vRoomPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+        ${ROOM_GLSL}
+        varying vec3 vRoomPos;`)
+      .replace('#include <lights_fragment_maps>', `#include <lights_fragment_maps>
+        {
+          vec3 nW = inverseTransformDirection(geometryNormal, viewMatrix);
+          vec3 vW = normalize(cameraPosition - vRoomPos);
+          vec3 rW = reflect(-vW, nW);
+          radiance = mix(radiance, chromeEnv(vRoomPos, rW, length(fwidth(rW)), 0.3), 0.85);
+        }`);
+  };
+  m.customProgramCacheKey = () => 'helmet-chrome';
+  return m;
+}
+
+// A custom studio for the paint's base layer: blue-black walls, the same
+// strip lights the analytic room has, and four dim panels where the cards
 // are. Rendered once into a PMREM.
 export function createStudioEnvironment(renderer, aspect = 16 / 9) {
   const Ly = ROOM_LY;
   const L = new Vector3(Ly * aspect, Ly, Ly * ROOM_DEPTH);
   const scene = new Scene();
-  scene.add(new Mesh(new BoxGeometry(2 * L.x, 2 * L.y, 2 * L.z), new MeshBasicMaterial({ color: new Color(0.02, 0.02, 0.022), side: BackSide })));
+  scene.add(new Mesh(new BoxGeometry(2 * L.x, 2 * L.y, 2 * L.z), new MeshBasicMaterial({ color: new Color(...PALETTE.stage).multiplyScalar(3), side: BackSide })));
 
   const glow = (k, tint = [1, 1, 1]) => new MeshBasicMaterial({ color: new Color(tint[0] * k, tint[1] * k, tint[2] * k), side: DoubleSide });
   for (const [face, a0, b0, a1, b1, k] of SOFTBOXES) {
@@ -264,7 +296,7 @@ export function createStudioEnvironment(renderer, aspect = 16 / 9) {
     scene.add(mesh);
   }
   for (const [sx, sy] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
-    const panel = new Mesh(new PlaneGeometry(L.x * 0.94, L.y * 0.94), glow(0.1, [1, 0.97, 0.94]));
+    const panel = new Mesh(new PlaneGeometry(L.x * 0.6, L.y * 0.5), glow(0.1, [0.86, 0.92, 1]));
     panel.position.set((sx * L.x) / 2, (sy * L.y) / 2, L.z * 0.99);
     panel.rotation.y = Math.PI;
     scene.add(panel);

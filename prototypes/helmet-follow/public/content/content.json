@@ -1,9 +1,9 @@
 {
   "pillars": [
-    { "name": "Sim Racing", "corner": "top-left", "clip": "clips/sim-racing.mp4" },
-    { "name": "Racing", "corner": "top-right", "clip": "clips/racing.mp4" },
-    { "name": "Commentating", "corner": "bottom-left", "clip": "clips/commentating.mp4", "focus": [0.45, 0.5] },
-    { "name": "Coaching", "corner": "bottom-right", "clip": "clips/coaching.mp4" }
+    { "name": "Sim Racing", "corner": "top-left", "clip": "clips/sim-racing.mp4", "still": "clips/sim-racing.webp", "stillAt": 1.9 },
+    { "name": "Racing", "corner": "top-right", "clip": "clips/racing.mp4", "still": "clips/racing.webp", "stillAt": 3.4 },
+    { "name": "Commentating", "corner": "bottom-left", "clip": "clips/commentating.mp4", "still": "clips/commentating.webp", "stillAt": 1.9, "focus": [0.45, 0.5] },
+    { "name": "Coaching", "corner": "bottom-right", "clip": "clips/coaching.mp4", "still": "clips/coaching.webp", "stillAt": 0.4 }
   ],
   "helmet": {
     "model": "helmet/helmet.glb",

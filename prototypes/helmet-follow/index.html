@@ -4,16 +4,31 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark" />
-    <title>Jack Johns · helmet prototype</title>
+    <meta name="theme-color" content="#10131a" />
+    <title>Jack Johns</title>
     <link rel="icon" href="data:," />
     <link rel="preload" href="content/content.json" as="fetch" crossorigin />
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
     <main id="stage">
-      <canvas id="gl"></canvas>
-      <nav id="pillars"></nav>
+      <canvas id="gl" aria-hidden="true"></canvas>
+      <nav id="pillars" aria-label="Jack Johns"></nav>
+      <button id="book" type="button" aria-expanded="false" aria-controls="lens">Book</button>
+      <section id="lens" hidden aria-label="Availability">
+        <p class="lens-name"></p>
+        <ul class="lens-slots"></ul>
+      </section>
     </main>
-    <script type="module" src="./src/main.js"></script>
+    <details id="credits">
+      <summary>Credits</summary>
+      <ul>
+        <li>Helmet: <a href="https://sketchfab.com/3d-models/f1-helmet-zhouguanyu-24-1124fa1f754645d7b9d54de84009d463" target="_blank" rel="noopener">“F1 Helmet ZhouGuanyu 24”</a> by Miopass, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified</li>
+        <li>Racing: <a href="https://commons.wikimedia.org/wiki/File:2023_TCR_World_Tour_at_El_Pinar_-_Afternoon_race_Video_01.webm" target="_blank" rel="noopener">“2023 TCR World Tour at El Pinar”</a> by NaBUru38, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, trimmed</li>
+        <li>Sim racing: Tima Miroshnichenko, Pexels. Commentating, coaching: Mixkit</li>
+        <li>Type: Archivo by Omnibus-Type, SIL OFL</li>
+      </ul>
+    </details>
+    <script type="module" src="./src/redline.js"></script>
   </body>
 </html>

@@ -1,12 +1,14 @@
-import { Vector3, Vector4 } from 'three';
+import { Matrix3, Vector3, Vector4 } from 'three';
+import { PALETTE_GLSL } from './palette.js';
 
-// The visor (and the shell's clear coat) reflect a virtual room around the
-// helmet. Every face of the room is split along x = 0 and y = 0, and each part
-// shows the clip of the page quadrant in that direction, so the helmet looking
-// into the top-left corner sees mostly the top-left clip. Each pixel traces its
-// own reflected ray into the room analytically: no cube camera, no extra
-// passes, no resolution limit, and the reflection is computed from this
-// frame's visor normal, so it can't lag the head.
+// Everything reflective on the page (visor, clear coat, chrome trim, card
+// frames, LED bezels, the Book pill, the haze crest) reflects one analytic
+// room around the helmet: a dark garage in Jack's blue, three strip lights,
+// and the four cards hung where the helmet can see them. Each pixel traces its
+// own reflected ray into the room, so nothing lags and nothing needs a cube
+// camera. The front wall carries the page's own layout (each card mirrored, as
+// a reflection should be); the side walls and ceiling carry a card in the
+// direction of each corner, so the helmet looking into a corner sees that card.
 //
 // Slots: 0 top-left, 1 top-right, 2 bottom-left, 3 bottom-right.
 
@@ -14,10 +16,9 @@ export const ROOM_LY = 6;
 export const ROOM_DEPTH = 0.9; // Lz = ROOM_DEPTH * Ly
 export const REST_LEVEL = 0.12;
 
-// Softboxes as [face, minA, minB, maxA, maxB, intensity] in units of the room
-// half extents. Faces: 0 ceiling (a = x, b = z), 1 right wall (a = z, b = y),
-// 2 left wall (a = z, b = y). They give the visor and the clear coat their
-// highlight lines, which sweep across them when the head turns.
+// Strip lights as [face, minA, minB, maxA, maxB, intensity] in units of the
+// room half extents. Faces: 0 ceiling (a = x, b = z), 1 right wall (a = z,
+// b = y), 2 left wall (a = z, b = y).
 export const SOFTBOXES = [
   [0, -0.72, 0.34, 0.72, 0.56, 5.0],
   [1, 0.18, -0.55, 0.42, 0.82, 3.2],
@@ -36,6 +37,8 @@ export function createRoomUniforms() {
     uFocusY: { value: new Vector4(0.5, 0.5, 0.5, 0.5) },
     uLevel: { value: new Vector4(REST_LEVEL, REST_LEVEL, REST_LEVEL, REST_LEVEL) },
     uRoom: { value: new Vector3(ROOM_LY * (16 / 9), ROOM_LY, ROOM_LY * ROOM_DEPTH) },
+    uCardRect: { value: [new Vector4(), new Vector4(), new Vector4(), new Vector4()] },
+    uChromeRot: { value: new Matrix3() },
   };
 }
 
@@ -45,6 +48,7 @@ const softboxGLSL = SOFTBOXES.map(
 ).join('\n    ');
 
 export const ROOM_GLSL = /* glsl */ `
+${PALETTE_GLSL}
 uniform sampler2D uClip0;
 uniform sampler2D uClip1;
 uniform sampler2D uClip2;
@@ -55,6 +59,8 @@ uniform vec4 uFocusX;
 uniform vec4 uFocusY;
 uniform vec4 uLevel;
 uniform vec3 uRoom;
+uniform vec4 uCardRect[4];
+uniform mat3 uChromeRot;
 
 vec3 roomDecode(vec3 c) {
   return mix(c * 0.0773993808, pow(c * 0.9478672986 + 0.0521327014, vec3(2.4)), step(0.04045, c));
@@ -65,7 +71,7 @@ float roomPick(vec4 v, int q) {
 }
 
 // Explicit LOD everywhere: the slot is chosen per pixel, so implicit derivatives
-// would be undefined, and across a wall edge they'd blow up into a seam.
+// would be undefined, and across a card edge they'd blow up into a seam.
 vec3 clipSample(int q, vec2 uv, float lod) {
   vec3 c;
   if (q == 0) c = textureLod(uClip0, uv, lod).rgb;
@@ -91,9 +97,29 @@ float softRect(vec2 p, vec4 r, float soft) {
   return 1.0 - smoothstep(-soft, soft, max(d.x, d.y));
 }
 
+// A card as the room shows it: desaturated and dim at rest, full colour awake,
+// with a thin bright frame where its chrome bezel would catch the light.
+vec3 roomCard(int q, vec2 st, vec2 size, float foot, float blur) {
+  float level = roomPick(uLevel, q);
+  float frame = 0.012 * max(size.x, size.y);
+  vec2 inner = min(st, 1.0 - st) * size;
+  float din = min(inner.x, inner.y);
+  vec3 c = vec3(0.0);
+  if (din > 0.0) {
+    float sx;
+    vec2 uv = clipCover(q, vec2(1.0 - st.x, st.y), size.x / size.y, sx);
+    float texels = foot * roomPick(uClipWidth, q) * sx / size.x;
+    c = clipSample(q, uv, log2(max(texels, 1.0)) + blur);
+    float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    c = mix(vec3(l) * vec3(0.8, 0.88, 1.0), c, smoothstep(0.15, 0.9, level)) * level;
+  }
+  float rim = 1.0 - smoothstep(frame - foot, frame + foot, abs(din));
+  return mix(c, vec3(0.05 + 0.25 * level), rim * 0.85);
+}
+
 // Radiance seen from p (inside the room) along unit direction d.
 // spread: angular size of one screen pixel along d (radians), for filtering.
-// blur: extra mip bias for rougher surfaces. strip: how bright the softboxes read.
+// blur: extra mip bias for rougher surfaces. strip: how bright the lights read.
 vec3 roomRadiance(vec3 p, vec3 d, float spread, float blur, float strip) {
   vec3 L = uRoom;
   vec3 dd = d + vec3(equal(d, vec3(0.0))) * 1e-6;
@@ -105,65 +131,65 @@ vec3 roomRadiance(vec3 p, vec3 d, float spread, float blur, float strip) {
 
   int q = -1;
   vec2 st = vec2(0.0);
-  vec2 panel = vec2(1.0);
-  float edge = 0.0;
+  vec2 size = vec2(1.0);
   float cosI = 1.0;
   int face = -1;
   vec2 fa = vec2(0.0);
+  float shade = 1.0;
 
   if (tF.z <= tF.x && tF.z <= tF.y) {
     cosI = abs(d.z);
     if (h.z > 0.0) {
-      // the wall behind the viewer: the page itself, seen from the helmet
-      q = (h.x < 0.0 ? 0 : 1) + (h.y > 0.0 ? 0 : 2);
-      st = vec2((h.x < 0.0 ? -h.x : L.x - h.x) / L.x, (h.y > 0.0 ? h.y : h.y + L.y) / L.y);
-      panel = vec2(L.x, L.y);
-      edge = min(min(abs(h.x), abs(h.y)), min(L.x - abs(h.x), L.y - abs(h.y)));
+      // the page itself, as the helmet sees it
+      vec2 P = vec2(0.5 + h.x / (2.0 * L.x), 0.5 + h.y / (2.0 * L.y));
+      for (int k = 0; k < 4; k++) {
+        vec4 r = uCardRect[k];
+        vec2 a = (P - r.xy) / (r.zw - r.xy);
+        if (a.x >= -0.02 && a.x <= 1.02 && a.y >= -0.03 && a.y <= 1.03) {
+          q = k;
+          st = a;
+          size = (r.zw - r.xy) * 2.0 * L.xy;
+        }
+      }
+    } else {
+      shade = 0.7;
     }
   } else if (tF.x <= tF.y) {
     cosI = abs(d.x);
+    float sx;
     if (h.x < 0.0) {
       q = h.y > 0.0 ? 0 : 2;
-      st.x = (L.z - h.z) / (2.0 * L.z);
+      sx = (L.z - h.z) / (2.0 * L.z);
       face = 2;
     } else {
       q = h.y > 0.0 ? 1 : 3;
-      st.x = (h.z + L.z) / (2.0 * L.z);
+      sx = (h.z + L.z) / (2.0 * L.z);
       face = 1;
     }
-    st.y = (h.y > 0.0 ? h.y : h.y + L.y) / L.y;
-    panel = vec2(2.0 * L.z, L.y);
-    edge = min(min(abs(h.y), L.y - abs(h.y)), L.z - abs(h.z));
+    float sy = (h.y > 0.0 ? h.y : h.y + L.y) / L.y;
+    st = (vec2(sx, sy) - vec2(0.1, 0.16)) / vec2(0.8, 0.68);
+    size = vec2(2.0 * L.z * 0.8, L.y * 0.68);
     fa = vec2(h.z / L.z, h.y / L.y);
   } else {
     cosI = abs(d.y);
-    st.x = (h.x < 0.0 ? -h.x : L.x - h.x) / L.x;
     if (h.y > 0.0) {
       q = h.x < 0.0 ? 0 : 1;
-      st.y = (L.z - h.z) / (2.0 * L.z);
+      float sx = (h.x < 0.0 ? -h.x : L.x - h.x) / L.x;
+      float sy = (L.z - h.z) / (2.0 * L.z);
+      st = (vec2(sx, sy) - vec2(0.12, 0.14)) / vec2(0.76, 0.6);
+      size = vec2(L.x * 0.76, 2.0 * L.z * 0.6);
       face = 0;
+      fa = vec2(h.x / L.x, h.z / L.z);
     } else {
-      q = h.x < 0.0 ? 2 : 3;
-      st.y = (h.z + L.z) / (2.0 * L.z);
+      shade = 0.45; // the floor: dark wet tarmac
     }
-    panel = vec2(L.x, 2.0 * L.z);
-    edge = min(min(abs(h.x), L.x - abs(h.x)), L.z - abs(h.z));
-    fa = vec2(h.x / L.x, h.z / L.z);
   }
 
-  // world-space size of this pixel's footprint where it lands on the wall
   float foot = spread * t / max(cosI, 0.12);
 
-  vec3 c = vec3(0.0035);
-  if (q >= 0) {
-    float sx;
-    vec2 uv = clipCover(q, st, panel.x / panel.y, sx);
-    float texels = foot * roomPick(uClipWidth, q) * sx / panel.x;
-    float lod = log2(max(texels, 1.0)) + blur;
-    c = clipSample(q, uv, lod) * roomPick(uLevel, q);
-    // dark mullions between the panels, filtered by the footprint
-    float gap = 0.035 * L.y;
-    c *= smoothstep(gap - foot, gap + foot, edge);
+  vec3 c = STAGE * 1.4 * shade;
+  if (q >= 0 && st.x > -0.03 && st.x < 1.03 && st.y > -0.03 && st.y < 1.03) {
+    c = roomCard(q, st, size, foot, blur);
   }
 
   float e = 0.0;
@@ -171,6 +197,26 @@ vec3 roomRadiance(vec3 p, vec3 d, float spread, float blur, float strip) {
     float soft = 0.02 + foot / L.y + blur * 0.02;
     ${softboxGLSL}
   }
-  return c + vec3(e * strip);
+  return c + vec3(0.9, 0.95, 1.0) * (e * strip);
+}
+
+// Chrome: a near-white metal reflecting the room, plus the studio horizon that
+// makes chrome read as chrome (lit above, a dark band at the horizon, the wet
+// floor below). uChromeRot follows the helmet a little, so even the chrome on
+// things that never move slides when the helmet turns.
+vec3 chromeEnv(vec3 p, vec3 R, float spread, float blur) {
+  vec3 r = uChromeRot * R;
+  vec3 env = roomRadiance(p, r, spread, blur, 1.0);
+  float up = r.y;
+  env += vec3(0.24, 0.27, 0.33) * smoothstep(0.08, 0.6, up);
+  env += vec3(0.55, 0.6, 0.68) * exp(-pow((up - 0.16) / 0.05, 2.0)) * 0.55;
+  env += STAGE_LIFT * 2.0 * smoothstep(-0.05, -0.5, up);
+  return env;
+}
+
+vec3 chromeShade(vec3 p, vec3 N, vec3 V, vec3 F0, float spread, float blur) {
+  vec3 R = reflect(-V, N);
+  float f = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 5.0);
+  return (F0 + (1.0 - F0) * f) * chromeEnv(p, R, spread, blur);
 }
 `;
