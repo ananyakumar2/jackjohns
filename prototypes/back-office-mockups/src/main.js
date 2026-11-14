@@ -75,11 +75,11 @@ function rail() {
 function switcher() {
   const view = TABS[route.tab].views[route.opt];
   return `<div class="rv" role="toolbar" aria-label="Mockup switcher">
-      ${Object.entries(TABS).map(([k, t]) => `<button class="${route.tab === k ? 'on' : ''}" data-tab="${k}">${t.name}</button>`).join('')}
+      ${Object.entries(TABS).map(([k, t]) => `<button class="${route.tab === k ? 'on' : ''}" data-tab="${k}"><span class="rv-l">${t.name}</span><span class="rv-s">${t.name.slice(0, 3)}</span></button>`).join('')}
       <span class="div"></span>
       ${OPTS.map((o) => `<button class="${route.opt === o ? 'on' : ''}" data-opt="${o}" aria-label="Option ${o.toUpperCase()}">${o.toUpperCase()}</button>`).join('')}
       <span class="div"></span>
-      <button data-phone title="Preview on a phone" aria-label="Preview on a phone">${icon('phone')}</button>
+      <button class="hide-phone" data-phone title="Preview on a phone" aria-label="Preview on a phone">${icon('phone')}</button>
     </div>
     <div class="rv-idea"><b>${TABS[route.tab].name} ${route.opt.toUpperCase()} · ${view.name}.</b> ${view.idea}</div>`;
 }

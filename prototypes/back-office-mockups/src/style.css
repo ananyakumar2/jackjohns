@@ -451,6 +451,8 @@ textarea.reply:focus, input.field:focus { outline: none; border-color: var(--blu
 .phone iframe { width: 100%; height: 100%; border: 0; border-radius: 36px; background: var(--stage); display: block; }
 .phone-close { position: fixed; top: 18px; right: 18px; }
 
+.rv-s { display: none; }
+@media (max-width: 760px) { .rv-s { display: inline; } }
 body.embed .rv, body.embed .rv-idea { display: none; }
 
 /* ---------- Phone ---------- */
@@ -474,6 +476,7 @@ body.embed .rv, body.embed .rv-idea { display: none; }
   .big { font-size: 22px; }
   .huge { font-size: 30px; }
   .rv { right: 8px; bottom: 76px; }
+  .rv-l { display: none; }
   .rv-idea { display: none; }
   .hide-phone { display: none !important; }
 }
