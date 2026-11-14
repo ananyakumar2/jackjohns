@@ -23,7 +23,7 @@ ${msgCss}
 .mb-q.jack { color: var(--dim); }
 .mb-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 10.5px; color: var(--dim); }
 .mb-scrim { position: fixed; inset: 0; z-index: 30; background: rgb(19 24 33 / 0.72); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 24px; }
-.mb-modal { width: min(760px, 100%); max-height: calc(100dvh - 48px); display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; background: var(--stage-2); border: 1px solid var(--line-2); border-radius: 18px; box-shadow: 0 30px 80px rgb(8 12 20 / 0.6); overflow: hidden; }
+.mb-modal { width: min(760px, 100%); max-height: calc(100dvh - 48px); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; background: var(--stage-2); border: 1px solid var(--line-2); border-radius: 18px; box-shadow: 0 30px 80px rgb(8 12 20 / 0.6); overflow: hidden; }
 .mb-modal > header { padding: 16px 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--line); }
 .mb-strip { padding: 12px 20px; display: flex; gap: 10px 18px; align-items: center; flex-wrap: wrap; background: var(--panel); border-bottom: 1px solid var(--line); font-size: 11px; color: var(--dim); }
 .mb-body { padding: 4px 20px 18px; overflow-y: auto; }

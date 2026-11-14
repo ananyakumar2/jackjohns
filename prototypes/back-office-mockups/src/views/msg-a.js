@@ -7,14 +7,14 @@ const css = `
 ${cardCss}
 ${msgCss}
 .ma { display: grid; grid-template-columns: 330px minmax(0, 1fr) 330px; height: calc(100dvh - 0px); }
-.ma-list { border-right: 1px solid var(--line); display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+.ma-list { border-right: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
 .ma-list header { padding: 22px 18px 12px; display: grid; gap: 14px; }
 .ma-th { width: 100%; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; padding: 13px 18px; border: 0; border-bottom: 1px solid var(--line); background: transparent; text-align: left; color: var(--type); }
 .ma-th:hover { background: var(--silver-soft); }
 .ma-th.on { background: var(--panel-2); box-shadow: inset 3px 0 0 var(--blue); }
 .ma-th .pv { font-size: 11px; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 2px; line-height: 1.45; }
 .ma-th.new .hi { color: #fff; }
-.ma-conv { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; }
+.ma-conv { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; }
 .ma-conv > header { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
 .ma-body { padding: 8px 24px 20px; }
 .ma-foot { padding: 14px 24px 20px; border-top: 1px solid var(--line); }
