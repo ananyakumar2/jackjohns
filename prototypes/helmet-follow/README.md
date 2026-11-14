@@ -1,10 +1,10 @@
-# Helmet follow: technical prototype
+# Redline: hero design
 
-A full-screen page split into four quadrants (Sim Racing, Racing, Commentating, Coaching), each showing its clip, with a real-time 3D racing helmet in the middle. The visor turns towards the cursor, the hovered quadrant's clip plays, and the visor reflects the clips.
+The Jack Johns hero. A real-time racing helmet looks at the cursor from the middle of a dark stage, with his name above it. Around it, four framed cards hold the pillars (Sim Racing, Racing, Commentating, Coaching) in a 2×2 grid that runs the full width of the screen, with a round opening cut for the helmet. Heat haze trails the cursor, a shift-light arc in the opening under the helmet fills towards the card it faces, and a small Book pill under the grid opens a lens of availability.
 
-This is a technical prototype for the hero, not a design. The helmet, livery, logo mark and clips are placeholders.
+The helmet, livery, logo, clips and availability are placeholders. There is no back end.
 
-## Run it
+## Run, build and publish
 
 ```bash
 cd prototypes/helmet-follow
@@ -13,221 +13,138 @@ npm run dev                      # http://localhost:5173
 npm run build && npm run preview # production build on http://localhost:4173
 ```
 
+`npm run build` writes a self-contained static site to `dist/`. All paths are relative (`base: './'`), so it works at a domain root or in a subfolder. The KTX2 transcoder (JS and WASM) is bundled from `three` into `dist/assets/`, and everything in `public/content/` is copied as is. Only `three` and `vite` are needed to build, and both are production dependencies, so `npm install --omit=dev` is enough. The asset scripts' packages are dev-only.
+
+The host must serve MP4 with byte ranges (HTTP 206). Safari won't play video without them, and Chrome can't park a clip on its still frame. Every mainstream static host does this.
+
 These URL parameters are for testing and are off by default:
 
 | Parameter | Effect |
 | --- | --- |
-| `?hud` | Frame time (median and p95), CPU and GPU time per frame, pixel ratio, render count, time to first quadrants and helmet, and bytes downloaded by type |
+| `?hud` | Frame time (median and p95), CPU and GPU time per frame, pixel ratio, render count, load timings and bytes by type |
 | `?dpr=1.5` | Fixes the pixel ratio and turns the adaptive governor off |
-| `?yaw=40&pitch=10` | Holds the head at a fixed angle (for stills) |
+| `?haze=0` | No heat haze |
 | `?still` | Same behaviour as `prefers-reduced-motion` |
-| `?bg=0` | Helmet only, without the quadrants |
+| `?yaw=40&pitch=10` | Holds the head at a fixed angle (for stills) |
 | `?capture` | Steps frames on a fixed clock for an external recorder (used for the proof video on a machine without a GPU) |
 
 ## What it does
 
-- **Look-at.** The visor faces the cursor. Each quadrant turns it into that corner, the centre of the screen faces the viewer, and the full range is ±82° of turn and ±60° of nod. A ray from the camera through the cursor lands on a plane just in front of the helmet, and the visor is pointed at the hit point. The rotation is smoothed with `k = 1 − (1 − 0.1)^(60·dt)` and then passed through an orientation spring (ωn 10, ζ 0.4), which gives the head some weight and a slight overshoot.
-- **Roll and lean.** On fast turns the head rolls into the corner, up to 11°. The whole head also drifts a little towards the cursor, and more slowly than it turns. That two-speed lag is the Nickho trick.
-- **Idle.** Once the cursor rests, a small float and micro-movement fade in, and they fade out again after 12 s so the page can stop rendering.
-- **Leaving the window** pauses all clips and eases the head back to neutral at half speed.
-- **Clips.** Hovering a quadrant plays its clip from wherever it was paused. Moving away pauses it on its current frame. The quadrant and the visor share one video texture.
-- **Drag to spin ("360").** Press on the helmet and drag to turn it any way you like, a full 360°. Let go and it carries on spinning with the drag's momentum, then settles back to looking at the cursor. This answers Ananya's "360" ask without giving up the look-at. The rotations compose as `look-at × spin × rest`. The back of the helmet carries a placeholder mark where Jack's logo goes.
-- **Touch.** There's no hover on touch screens. With nothing playing, the head looks into each corner in turn. Tapping a quadrant plays its clip and turns the head towards it, and a second tap pauses it. Phone tilt (DeviceOrientation, which iOS asks permission for on the first tap) steers the head. The tilt part has not been tried on a real phone yet.
-- **Reduced motion.** There's no overshoot, roll, float or spin momentum. The look-at itself stays.
+- **Stage.** A night pit garage: a wall in Jack's blue in deep shade, a soft light pool behind the helmet, and a wet floor that reflects the cards, the arc and the pill with a streaky, patchy smear. The wall picks up the colour of the card that's awake.
+- **Name.** "Jack Johns" over the grid, centred, in the site's type at a larger size. It is silver with a faint chrome sheen from the shared studio room, so its highlight slides a little as the helmet turns. It is drawn into the canvas (so the haze bends it), with a transparent `h1` on top for selection and screen readers.
+- **Cards.** Four wide cards in a 2×2 grid that fills the screen's width (with normal side padding) and the height between the name and Book. Each has its inner corner cut on one circle round the helmet, so the four read as one frame with a round opening. Each keeps its own silver chrome bezel, which follows the cut, with clear gutters between them. At rest each one is a cool desaturated still, all brought to one brightness so they read as a set. Hovering wakes a card into full-colour footage with a small overshoot. Leaving freezes it on its current frame and lets the colour drain. Cards lean towards the cursor (the hovered one most), and a fast flick knocks them so they wobble and ring out. Each clip cover-fits its own card (cropped, never letterboxed). The only other words are the pillar names. On wide screens they sit at the grid's outer edges in the two rows the name and Book already use: Sim Racing and Racing level with the name, Commentating and Coaching level with Book. On narrow screens the grid is square, with the names above and below it.
+- **Helmet.** The motion is unchanged from the prototype: look-at with a spring, roll into turns, two-speed lean, idle float, drag to spin 360°. It is about 18 % smaller. The visor reflects the stage and the cards, desaturated at rest and in colour when awake. The trim is environment-mapped silver chrome.
+- **Heat haze** over the whole hero, in the same WebGL canvas. A lagging head chases the cursor and stamps a small velocity and density field, which drifts, blurs and fades at a fixed 60 Hz. One full-screen pass bends the finished frame with it.
+  - Strongest over the footage, light over the stage, quiet over the helmet, and gone about a second after the cursor stops.
+  - Where the wake folds over, it catches the light like liquid chrome: only bright reflections show, so it glints rather than fogs. A flick at the limiter turns the glints gold.
+  - A faint thin-film fringe runs gold, silver and blue, the colours heat leaves on titanium.
+- **Shift-light arc.** Fifteen chrome-cupped LEDs in the gap between the helmet's chin and the cards, following the opening's curve, glowing in Jack's blue. They fill from the centre towards the side the helmet faces, kick past and settle when the faced card changes, sweep once on arrival, and flash gold three times at redline (a flick over 2,600 px/s). With nobody steering, only the centre LED breathes. It is a curve that fills by amount, never a row that counts down, so it can't read as start lights.
+- **Book.** One small pill under the grid, centred below the gutter between the bottom cards. The helmet's gaze pre-selects the pillar. Clicking fills the pill with liquid chrome from the side the cursor came in, then opens a lens around the helmet: Jesper's lens without the black disc. The rim bends the page around it, the inside is smoked glass, and the pillar name and six placeholder slots sit on top. Picking a slot fills it with blue from the entry point. Esc, a click outside or Book again closes it. On narrow screens it shows four slots in one column.
+- **Touch.** With nothing awake, the head looks at each card in turn. A tap wakes a card and turns the head, a finger drag leaves haze, and phone tilt steers the head (not yet tried on a real phone).
+- **Reduced motion.** No haze, no overshoot, roll, float, card lean or wobble, and the arc stays at its dim centre LED. The look-at, the card wake and the lens stay.
+- **Credits.** A small "Credits" toggle in the bottom-left corner carries the attribution the CC BY and CC BY-SA licences require.
 
-## Swapping clips, livery and logo
+## Look
+
+**Palette.** Taken from Jack: the blue of his Supra, and the silver and gold chrome of his liveries and wheels. Chrome is the signature, and it's real environment-mapped metal everywhere (card bezels, arc LEDs, pill rim and ink, helmet trim, haze glints), all lit by one shared studio environment that turns a little with the helmet, so every highlight slides when the head moves. Blue is the anchor in measured doses: the helmet, the lit LEDs and a picked slot. The stage is Jack's blue in deep shade (`#131821`), not black, so the chrome has something cool to reflect. There is no red, black-and-red, off-white or orange, and no chequered flags, stripes or carbon fibre.
+
+| | Linear RGB | Use |
+| --- | --- | --- |
+| Stage | 0.0105, 0.0121, 0.0170 (`#131821`) | Wall, floor, lens glass |
+| Jack's blue | 0.045, 0.24, 1.0 | LED glow, helmet; `#2f66e0` for a picked slot |
+| Silver chrome | F0 0.90, 0.92, 0.95 | Bezels, trim, rims, glints |
+| Gold chrome | F0 1.0, 0.77, 0.36 | Redline flash, flick glints |
+| Type | `#c6ced9` | Name, pillar names, Book, slots |
+
+**Typeface.** Archivo Expanded SemiBold (Omnibus-Type, SIL Open Font License), self-hosted as one 14 KB WOFF2. It is wide, low-contrast and engineered, like the lettering on a car badge or a dash, so the names feel automotive without an icon. It is set uppercase at 11.5 px with 0.18 em tracking. Inter, Roboto and the system defaults would make it look like an app.
+
+## Reusable parts (for Push Start and Wind Tunnel)
+
+Each part takes the shared room uniforms and an exposure, and knows nothing about this layout:
+
+| Module | Provides |
+| --- | --- |
+| `palette.js` | The palette in JS, CSS and GLSL, and `toDisplay` / `patchDisplay` for tone mapping inside any material |
+| `room.js` | `roomRadiance` (the page as an analytic room), `chromeEnv` and `chromeShade` (silver or gold chrome from one environment) |
+| `stage.js` | Back wall, wet floor and the mirror pass that reflects anything on layer 1 |
+| `cards.js` | `Card` (framed footage with still/awake states, lean and wobble) and `Spring` |
+| `haze.js` | The haze field and the full-screen pass, including the lens. It takes mask rectangles, so any layout can use it |
+| `labels.js` | A tracked-text atlas and names drawn inside the canvas, so the haze bends them |
+| `arc.js`, `booking.js` | The shift-light arc and the Book pill with its lens |
+| `layout.js` | Screen-to-world mapping and this hero's composition (the only file that is Redline-specific, with `redline.js`) |
+
+## Swapping clips, stills, livery and logo
 
 Everything Jack's team replaces lives in `public/content/`. Nothing in `src/` needs to change.
-
-```
-public/content/
-  content.json          what goes where
-  clips/*.mp4           one per pillar
-  helmet/helmet.glb     the model
-  helmet/livery.ktx2    the paint (PNG, JPG and WebP also work)
-  helmet/livery-template.png   the UV guide to paint on
-  helmet/logo.png       the mark on the back of the helmet
-```
 
 ```json
 {
   "pillars": [
-    { "name": "Sim Racing",   "corner": "top-left",     "clip": "clips/sim-racing.mp4" },
-    { "name": "Racing",       "corner": "top-right",    "clip": "clips/racing.mp4" },
-    { "name": "Commentating", "corner": "bottom-left",  "clip": "clips/commentating.mp4", "focus": [0.45, 0.5] },
-    { "name": "Coaching",     "corner": "bottom-right", "clip": "clips/coaching.mp4" }
+    { "name": "Sim Racing",   "clip": "clips/sim-racing.mp4",   "still": "clips/sim-racing.webp",   "stillAt": 1.9 },
+    { "name": "Racing",       "clip": "clips/racing.mp4",       "still": "clips/racing.webp",       "stillAt": 3.4 },
+    { "name": "Commentating", "clip": "clips/commentating.mp4", "still": "clips/commentating.webp", "stillAt": 1.9, "focus": [0.45, 0.5] },
+    { "name": "Coaching",     "clip": "clips/coaching.mp4",     "still": "clips/coaching.webp",     "stillAt": 0.4 }
   ],
   "helmet": { "model": "helmet/helmet.glb", "livery": "helmet/livery.ktx2", "logo": "helmet/logo.png", "logoSize": 0.62 }
 }
 ```
 
-`focus` is the point of the clip, from 0 to 1, that stays in view when a quadrant crops it. The default is the centre. `logoSize` is the logo's width as a fraction of the helmet's width.
+- `still` is the card's resting image, and the page reveals as soon as the four stills are in. It's a frame from the clip for now, and can later be an anime still. Any WebP, JPG or PNG works. About 1280×720 at WebP quality 80 is 15–50 KB.
+- `stillAt` is the time in seconds where the clip is parked, so waking a card continues from the still. Use the time the still was taken from (or 0 for a still that isn't a frame).
+- `focus` is the point of the clip, from 0 to 1, that stays in view when a card crops it. Each card loses its inner corner to the opening, so the subject should sit towards the card's outer side (left for the left-hand cards, right for the right-hand ones).
 
-### What Jack should deliver
-
-**Clips, one per pillar.**
-- 1920×1080 or larger, landscape, 25–60 fps.
-- 4–6 s of continuous action that can loop. We crossfade the end into the start.
-- No burned-in text, logos, watermarks or letterboxing.
-- H.264 at a high bitrate, or ProRes 422. Audio is ignored.
-
-We encode each one to 1280×720 H.264 (High profile, CRF 24, a keyframe every second, `+faststart`, no audio), which comes to about 0.3–1 MB per clip. One clip can be encoded by hand like this:
-
-```bash
-ffmpeg -ss 0 -t 4.5 -i master.mov -vf "scale=1280:720,format=yuv420p" -an \
-  -c:v libx264 -profile:v high -preset slow -crf 24 -g 25 -keyint_min 25 -sc_threshold 0 \
-  -movflags +faststart public/content/clips/racing.mp4
-```
-
-`scripts/encode-clips.sh` does the same and also adds the loop crossfade. It currently points at the placeholder sources, so add Jack's files to its list.
-
-**Livery.**
-- A 2048×2048 PNG painted over `helmet/livery-template.png`.
-- In the template, light grey is paint, dark grey is trim (vent caps and the gasket, which stay graphite), black is unused, and the white lines outline the UV islands.
-- Helmet painters already work from flat templates like this, so his painter or designer can use it directly.
-- Convert it with KTX-Software:
+**What Jack should deliver.**
+- **Clips:** one per pillar, 1920×1080 or larger, landscape, 25–60 fps, 4–6 s of continuous action that can loop, no burned-in text or letterboxing, H.264 at a high bitrate or ProRes 422. We encode each to 1280×720 H.264 (CRF 24, 1 s keyframes, `+faststart`, no audio) with `scripts/encode-clips.sh`, about 0.3–1 MB each.
+- **Livery:** a 2048×2048 PNG painted over `helmet/livery-template.png` (light grey is paint, dark grey is trim, white lines are the UV islands), converted with KTX-Software:
 
 ```bash
 ktx create --format R8G8B8_SRGB --assign-tf srgb --encode uastc --uastc-quality 2 --uastc-rdo \
   --zstd 19 --generate-mipmap livery.png public/content/helmet/livery.ktx2
 ```
 
-You can also point `content.json` at the PNG directly. It works, but uses about four times the GPU memory.
+- **Logo:** a square PNG with a transparent background, at least 512 px. It sits on the back of the shell.
+- **Model:** any glTF with meshes named `Shell`, `Visor`, `Trim`, `Padding` and `Vents`, facing +Z, with the same `Shell` UV layout. `scripts/build-helmet.mjs <source.glb>` turns the current source model into these assets (it needs ffmpeg and KTX-Software).
 
-**Logo.** A square PNG with a transparent background, at least 512 px. It is projected onto the back of the shell. Dark marks read best on a light livery.
+The best route to Jack's real helmet is a model commissioned from 8–12 photos of it plus its make and model, his livery as flat artwork, his logo and the visor tint.
 
-**Model.** See [Jack's real helmet](#jacks-real-helmet) below. Any glTF works, provided its meshes are named `Shell`, `Visor`, `Trim`, `Padding` and `Vents`, faces +Z and has the same UV layout for `Shell`. `scripts/build-helmet.mjs <source.glb>` turns the current source model into these assets. It needs ffmpeg and KTX-Software (`ktx` on `PATH` or `KTX_BIN=…`).
+## How it renders
 
-## How the visor reflection works
+One WebGL canvas, rendering on demand:
 
-The visor doesn't reflect a rendered environment. Its shader traces each pixel's reflection ray into an imaginary room around the helmet, the size of the screen:
+1. **Floor reflection.** A mirror camera renders the cards, arc and pill into a target at one sixth of the resolution.
+2. **Scene.** Stage, cards, arc and helmet render into a 4× multisampled target. Every material tone-maps itself (three's Neutral curve) and writes display-ready colour, so the haze can bend a finished image.
+3. **Names.** Drawn into the same target from a text atlas.
+4. **Haze and lens.** One full-screen pass reads the scene target and the haze field and writes the canvas.
+5. **Book pill.** Drawn last, on top, so the haze and the lens never bend or copy it.
 
-- The **front wall** is the page itself, with the four clips in their quadrants.
-- The **side walls, ceiling and floor** continue the quadrant beside them. For example, the top half of the left wall is Sim Racing and the bottom half is Commentating.
-- There are **three softboxes**: a strip in the ceiling, one on the right wall and a rim light behind on the left. They make highlights that slide across the visor as the head turns.
-
-The ray hits a box, so the hit point is a closed-form calculation, with no cube camera, no render-to-texture and no extra pass. That gives the behaviour the brief asked for:
-
-- **Zero lag.** The reflection is computed every frame from the visor's current normal and view direction, so it moves exactly with the head.
-- **Updates with the video.** Each clip is uploaded once per decoded frame, using `requestVideoFrameCallback` through three's `VideoTexture`, and that same texture feeds both the quadrant and the visor. The reflection therefore refreshes on every new video frame, not only when the hover changes.
-- **No seams.** The room is one continuous function, so there are no cube-map faces to stitch.
-- **Sharp at any DPR.** The shader samples the source video texture at a mip level worked out from the ray's footprint (`fwidth` of the reflected direction × distance ÷ incidence). Every screen pixel gets a correctly filtered texel.
-- **Mirroring and convex distortion come from the geometry.** The visor's own smooth mesh normals are used, so its curve stretches and squeezes the clips the way a real visor does.
-- **Look.**
-  - Schlick Fresnel with F0 0.3 for a smoked or iridium visor.
-  - A thin-film tint from cool head-on to warm at grazing angles.
-  - A near-black interior showing through where the Fresnel term is low.
-
-The shell's clear coat uses the same room function, so the paint also catches faint reflections of the clips. The shell's base layer and the trim are lit by a PMREM of a custom studio scene: a dark box with the same three softboxes and four dim panels. It is not a stock HDRI.
-
-**What it can't do.**
-- The room is an approximation of the page, not the true 3D world.
-- The helmet doesn't reflect itself, so the vent caps don't show up in the visor.
-- Anything placed around the helmet later (sections 2 and 3, the haze) won't appear in the visor unless it is added to the room function.
-
-It also has a cost. A real cube camera would reflect anything automatically, but it re-renders the scene six times per frame, and doing it on alternate frames brings back exactly the lag the brief rules out.
+The visor, card glass and all the chrome use `roomRadiance`: each reflection ray is traced in closed form into an imaginary room the size of the page, whose front wall is the four cards. That gives zero-lag reflections that update with every video frame, with no cube camera.
 
 ## Performance
 
-Techniques:
-- **Mesh and textures.**
-  - Meshopt and quantised glTF: 37k vertices and 67k triangles in 388 KB.
-  - KTX2 (UASTC + zstd) textures, transcoded in a worker.
-  - H.264 clips with a 1 s GOP.
-- **Rendering.**
-  - Render on demand: the loop sleeps once the head, the quadrant brightness and the entry animation have settled.
-  - While a clip plays and nothing else moves, the page renders only on new video frames.
-  - Hidden tabs pause the clips and the loop.
-  - Delta time is capped at 50 ms.
-- **Pixel ratio.**
-  - An adaptive governor works from the median of the last 90 frame intervals against the display's own refresh rate.
-  - It steps in 0.25 increments and drops quickly but rises slowly.
-  - It is capped at 2 and at an 8.3 MP budget, and it remembers the result per screen.
-- **Warm-up before the helmet appears.**
-  - Every texture is uploaded with `initTexture` and every program is compiled with `compileAsync`.
-  - The first frame of every clip is decoded.
-  - One hidden render runs into a 64×64 target.
-  - Then the helmet appears with a small `back.out` scale and exposure fade, so the first turn never hitches and nothing pops in blank.
-- **Clip watchdog.** If a clip that should be playing makes no progress for 3 s it gets a nudge, and a second time it is reloaded from the same timestamp.
+- **Render on demand.** The loop sleeps when the head, cards, arc, haze and lens have all settled; while one clip plays and nothing moves it renders only on new video frames. Hidden tabs pause everything.
+- **Adaptive pixel ratio.** A governor works from the median of the last 90 frame intervals against the display's refresh rate, steps in 0.25s between 1 and 2, drops fast and rises slowly, and keeps under an 8.3 MP budget. It remembers its choice per screen.
+- **Haze.** A 256-wide half-float field with at most three small simulation passes per frame. It stops simulating, and the post pass skips its work, about a second after the cursor stops.
+- **Loading.** Stills gate the reveal; the clips load 250 ms after it, and each video is parked on its still's frame before it goes live. Every texture is uploaded and every program compiled before the stage appears, and the helmet warms up off-screen before it fades in.
+- **Clip watchdog.** A clip that should be playing but makes no progress for 3 s gets nudged, then reloaded from the same time.
 
 ### Measured
 
-These were measured on a cloud VM **without a GPU**. Chrome renders WebGL in software (SwiftShader), which affects timings as follows:
-- **Byte counts** are exact.
-- **Load times** are pessimistic, because shader compilation runs on the CPU here.
-- **GPU frame time** can't be measured here.
+These were measured on a cloud VM **without a GPU** (Chrome's SwiftShader), so byte counts are exact, load times are pessimistic and GPU time can't be measured.
 
 | | |
 | --- | --- |
-| JS | 196 KB (gzip) app + 15 KB KTX2 transcoder wrapper + 527 KB transcoder WASM (249 KB if the host compresses WASM, as most CDNs do) |
-| Model | 388 KB (`helmet.glb`, including the 256² trim texture) |
-| Textures | 99 KB (livery 89 KB as KTX2, logo 10 KB) |
-| Video | 2.98 MB (four clips of 4–4.5 s at 720p) |
-| Other | 3 KB (HTML, CSS, `content.json`) |
-| Quadrants visible | 1.75 s on localhost, 1.36 s on 50 Mbps / 20 ms, 1.98 s on 12 Mbps / 70 ms (simulated 4G) |
-| Helmet visible | 1.72 s on localhost, 2.15 s on 50 Mbps, 3.70 s on simulated 4G |
-| CPU per frame | 0.6 ms median (motion and draw submission, 1440×900) |
-| Motion | Same at 60 and 120 Hz: a corner-to-corner turn is 90 % done in 0.48 s, overshoot is 2.7 %, roll peaks at 10.7°, and a flicked spin settles in about 1.5 s |
-| Sleep | The loop stops about 18 s after the last input (after the idle float fades). With no input and nothing playing, it renders 0 frames |
+| JS | 210 KB gzip (three.js and the app, one chunk) + 15 KB transcoder wrapper + 527 KB transcoder WASM (249 KB if the host compresses WASM) |
+| CSS, HTML, font, `content.json` | 17 KB |
+| Stills | 134 KB (four WebP) |
+| Helmet | 387 KB model + 83 KB livery (KTX2) + 10 KB logo |
+| Video | 3.0 MB (four clips at 720p), loaded after the reveal |
+| Helmet visible | 3.3–3.5 s on localhost in software rendering, most of it CPU shader compilation that a GPU does in a fraction of the time |
 
-**Real GPUs (estimate, not measured).** Per pixel, the work is the quadrant pass (one filtered texture read) plus, inside the helmet's footprint, a physical material with clear coat and the room function (a ray-box hit and one or two filtered reads). On an integrated laptop GPU (Apple M1, Intel Iris Xe) at a 5 MP backbuffer, that should come to about 2–4 ms per frame. That is well inside 16.7 ms at 60 Hz and 8.3 ms at 120 Hz, and the governor lowers the resolution if not. Check this with `?hud` on real hardware, since `EXT_disjoint_timer_query` reports GPU time, before treating it as fact.
-
-**Where the bytes go.**
-- **Video** is 70–75 % of the page. The helmet waits for the first frame of every clip, because the visor shows them, so on a slow connection the clips hold back the helmet: 3.7 s on 4G.
-- **KTX2's transcoder** (264 KB compressed) costs more than it saves when there's only one texture. KTX2 earns its place through GPU memory (5.6 MB instead of 22 MB for a 2K livery) and no main-thread decode, and that matters more once sections 2 and 3 add textures. For a hero with only the livery, a WebP livery is a fair choice, and `content.json` already accepts one.
-
-**For production.**
-- Serve over HTTP/2 or HTTP/3 with compression on WASM.
-- Give each clip a small poster frame, and reveal the helmet when the posters (not the clips) are in.
-- Let the clips stream after the helmet.
-- Detect software rendering (`WEBGL_debug_renderer_info` reporting SwiftShader or llvmpipe) and show a still instead, as Grail does.
-
-## How this compares to the reference studies
-
-| | Nickho | Grail totems | A24 discs | This prototype |
-| --- | --- | --- | --- | --- |
-| Object | Pre-rendered 180-frame AVIF turntable (~7.8 MB), spun by scroll | Real-time GLB per figure (~0.7–1.2 MB) | Real-time discs (clear coat, iridescence, glass) | Real-time GLB (388 KB) + 99 KB of textures |
-| Follows cursor | Slides ±52 px and leans ±11°, ignores vertical | Leans ±29° turn and ±23° nod | Not studied for this | Looks into every corner (±82° / ±60°), plus drag to spin 360° |
-| Feel | Two-speed lag, `back.out` pop | Frame-rate-independent easing, bob | | Both, plus a spring with slight overshoot, roll into turns, idle float, momentum spin |
-| Rendering | Redraws only when the frame changes | Every frame while active | Render on demand, adaptive resolution, pause off-screen | Render on demand, adaptive resolution with an MP budget, pauses when hidden |
-| Loading | | Loads near the section, no cache, no preload | Worker texture decoding, GPU pre-upload, `compileAsync` | KTX2 worker transcoding, `initTexture`, `compileAsync`, hidden warm-up render, then reveal |
-
-From **edolus** (section 21a):
-- **Adopted as written:**
-  - The `look-at × dragSpin × rest` composition.
-  - `k = 1 − (1 − s)^(60·dt)` smoothing.
-  - The camera ray onto a plane with a ±60° pitch clamp.
-  - A slerp of 0.1 followed by a spring-damper.
-  - Warm-up before the first show.
-  - Uploads only on new video frames.
-  - The stall watchdog.
-  - An adaptive pixel ratio with a megapixel budget.
-  - Tap to play and a tilt fallback.
-- **The reflection caution is handled.** The reflection refreshes on every new video frame, and head-to-reflection lag is zero by construction.
-- **One disagreement: video textures here keep mipmaps.** Edolus drops mipmaps from video textures. Here the visor shows each clip shrunk 5–10×, and without mipmaps that reflection shimmers as the head moves. The mips are rebuilt only when a new frame is uploaded, at 25–30 per second, on one clip at a time.
-
-## Jack's real helmet
-
-The placeholder is a generic closed-face car helmet. To make it Jack's, the choices are:
-
-1. **Commission a model from photos (recommended).** Tell us the make and model of his helmet (for example Bell HP7, Stilo ST5 or Arai GP-7) and send 8–12 photos round it in even light, plus close-ups of the visor, vents and spoiler. A 3D artist can build a clean, game-ready shell, with the visor as its own mesh and UVs laid out for livery painting. This route gives the best result.
-2. **Buy a model of the same shell.** Stock models of common racing helmets exist, as this placeholder shows. It is the cheapest route, but check the licence (CC BY or a commercial licence) and the topology.
-3. **3D-scan his helmet.** This gets the shape exactly, but glossy paint and a mirrored visor scan badly. The helmet would need a temporary matte spray, and the result still needs retopology and new UVs. It's not worth it for a hero this size.
-
-Whichever route is chosen, also get:
-- His livery as flat artwork. Vector is best, otherwise a 2K PNG on the template.
-- His logo.
-- The visor tint (clear, smoked, iridium and which colour), so the visor shader can match it.
+**Real GPUs (estimate, not measured).** Per pixel: a card fragment (one filtered video read, two room lookups for glass and bezel), the floor (eight reflection taps), the helmet's physical material inside its footprint, and the post pass (one scene read, five field reads, and chrome only on the haze crest or lens rim). On an integrated laptop GPU (Apple M1/M2, Intel Iris Xe) at a 4–5 MP backbuffer that should be about 3–6 ms per frame, inside 16.7 ms at 60 Hz. If not, the governor lowers the resolution. Check with `?hud` on real hardware before treating this as fact.
 
 ## Sources and licences
 
-**Model.** "F1 Helmet ZhouGuanyu 24" by Miopass, [Sketchfab](https://sketchfab.com/3d-models/f1-helmet-zhouguanyu-24-1124fa1f754645d7b9d54de84009d463), CC BY 4.0. Modifications made here:
-- The livery was replaced with a plain placeholder and the team-coloured trim recoloured graphite.
-- The visor was split from the vents, and the vents simplified.
-- The camera was removed.
-- Everything was recompressed.
-
-Credit is required wherever the prototype is shown.
+**Model.** "F1 Helmet ZhouGuanyu 24" by Miopass, [Sketchfab](https://sketchfab.com/3d-models/f1-helmet-zhouguanyu-24-1124fa1f754645d7b9d54de84009d463), CC BY 4.0. Modified: the livery was replaced with a plain metallic blue and a silver mark, the trim turned into chrome, the visor split from the vents and the vents simplified, the camera removed, and everything recompressed. Credit is required wherever it's shown, and the page credits it.
 
 **Clips.**
 
@@ -238,27 +155,33 @@ Credit is required wherever the prototype is shown.
 | Commentating | ["Man talking in front of a radio station microphone"](https://mixkit.co/free-stock-video/man-talking-in-front-of-a-radio-station-microphone-2963/), Mixkit | Mixkit Stock Video Free License | 2.0–6.5 s, landscape crop of a portrait clip |
 | Coaching | ["Dashboard of a car"](https://mixkit.co/free-stock-video/dashboard-of-a-car-72/), Mixkit | Mixkit Stock Video Free License | 6.0–10.5 s |
 
-The Racing clip is share-alike, so the trimmed clip is also CC BY-SA 4.0 and needs attribution. All four are placeholders until Jack's footage arrives.
+The Racing clip and its still are share-alike, so the trimmed versions are also CC BY-SA 4.0 and need attribution, which the page gives. The stills are frames from these clips. All of them are placeholders until Jack's footage arrives.
+
+**Type.** Archivo by Omnibus-Type, SIL Open Font License 1.1. The licence is in `src/fonts/OFL.txt`.
 
 ## Dependencies
 
-- **`three`** (MIT) is the only runtime dependency. It provides the renderer, `GLTFLoader`, `KTX2Loader` and `MeshoptDecoder`. Everything else, including the look-at, springs, reflection, governor and touch handling, is about 1,400 lines in `src/`.
-- **`vite`** is the dev server and bundler.
-- **`@gltf-transform/*` and `meshoptimizer`** are used only by `scripts/build-helmet.mjs`, to split, clean and compress the source model.
-- **Outside npm:**
-  - ffmpeg encodes the clips and handles some images.
-  - KTX-Software's `ktx` makes the KTX2 textures.
+- **`three`** (MIT) is the only runtime dependency: renderer, `GLTFLoader`, `KTX2Loader`, `MeshoptDecoder`. Everything else (look-at, springs, haze, chrome, cards, arc, lens, governor, touch) is about 3,200 lines in `src/`, with no UI or animation libraries.
+- **`vite`** builds and serves it.
+- **`@gltf-transform/*` and `meshoptimizer`** are used only by `scripts/build-helmet.mjs`. ffmpeg and KTX-Software's `ktx` are needed only to rebuild assets.
 
 ## Files
 
 ```
-src/main.js      page, render-on-demand loop, input, touch, arrival
+src/redline.js   page, loop, input, touch, arrival (this hero)
+src/layout.js    screen-to-world mapping and the composition
+src/palette.js   palette and in-shader tone mapping
+src/room.js      the analytic room and chrome
+src/stage.js     wall, wet floor, mirror pass
+src/cards.js     framed cards and springs
+src/labels.js    text atlas and in-canvas names
+src/arc.js       shift-light arc
+src/booking.js   Book pill and lens content
+src/haze.js      heat haze and the lens pass
+src/helmet.js    model, visor, shell and chrome trim
 src/motion.js    look-at, springs, roll, idle, drag spin
-src/room.js      the reflection room shared by the visor, shell coat and quadrants
-src/helmet.js    model loading, visor and shell materials, studio environment
-src/quadrants.js the four clips as one full-screen pass
-src/clips.js     video elements, shared textures, watchdog
+src/clips.js     stills, videos, watchdog
 src/perf.js      pixel-ratio governor, ?hud
 src/capture.js   ?capture only
-scripts/         asset build (model, livery, clips)
+scripts/         asset builds (model, livery, clips)
 ```

@@ -4,7 +4,7 @@
 //
 // Needs ffmpeg and KTX-Software 4.x (`ktx`) on PATH (or KTX_BIN=/path/to/ktx).
 // Output: helmet.glb (meshopt + quantised, trim texture as KTX2), livery.ktx2
-// (neutral placeholder), livery-template.png (UV guide for designers), logo.png.
+// (placeholder in Jack's blue), livery-template.png (UV guide for designers), logo.png.
 
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, statSync } from 'node:fs';
@@ -27,9 +27,10 @@ const KTX = process.env.KTX_BIN || 'ktx';
 const TMP = mkdtempSync(join(tmpdir(), 'helmet-'));
 mkdirSync(OUT, { recursive: true });
 
-// Placeholder livery: warm off-white gloss, so it reads as "not Jack's yet".
-const LIVERY_RGB = [233, 231, 226];
-const LOGO_RGB = [38, 39, 43];
+// Placeholder livery: a plain metallic blue from Jack's car, with a silver mark.
+// The page turns the trim into silver chrome; Jack's own livery replaces all of it.
+const LIVERY_RGB = [20, 50, 128];
+const LOGO_RGB = [205, 211, 219];
 
 await MeshoptEncoder.ready;
 await MeshoptDecoder.ready;
