@@ -112,7 +112,7 @@ function wheel(root, ctx) {
           onclick: () => ctx.pick(id),
         },
         el('span', { class: 'w-cap' }),
-        el('span', { class: 'up w-label', text: o.name }),
+        el('span', { class: 'up w-label' }, el('span', { text: o.name }), price(o)),
       ),
     );
   });

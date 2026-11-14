@@ -2,47 +2,48 @@
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-rows: 17.5cqi 1fr auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
   justify-items: center;
   align-items: center;
-  gap: 1.6cqi;
-  padding: 0 12cqi 8cqi;
+  gap: 2cqmin;
+  padding: 4cqmin 10cqmin 4cqmin;
 }
 
 .c-top {
-  align-self: end;
+  align-self: start;
+  padding: 0 4cqmin;
 }
 
 .c-body {
   display: grid;
   justify-items: center;
-  gap: 2cqi;
+  gap: 2cqmin;
   width: 100%;
 }
 
 .c-foot {
   display: flex;
   align-items: center;
-  gap: 2.4cqi;
-  min-height: 6cqi;
+  gap: 2.4cqmin;
+  min-height: 6cqmin;
 }
 
 .c-sum {
   display: grid;
-  gap: 0.7cqi;
+  gap: 0.7cqmin;
   text-align: right;
-  min-width: 18cqi;
+  min-width: 18cqmin;
 }
 
 .c-sum .price {
-  font-size: max(10px, 1.25cqi);
+  font-size: max(10px, 1.25cqmin);
   opacity: 0.7;
 }
 
 .arrow {
   position: relative;
-  width: 3.6cqi;
-  height: 3.6cqi;
+  width: 3.6cqmin;
+  height: 3.6cqmin;
   min-width: 24px;
   min-height: 24px;
   padding: 0;
@@ -78,36 +79,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 3cqi;
-  min-width: 30cqi;
+  gap: 3cqmin;
+  min-width: 30cqmin;
 }
 
 .m-head .up,
 .st-nav .up {
-  min-width: 16cqi;
+  min-width: 16cqmin;
   text-align: center;
 }
 
+.cal.month.opt-sim .c-body {
+  grid-template-columns: auto auto;
+  grid-template-areas: 'head hours' 'grid hours';
+  justify-content: center;
+  align-items: center;
+  column-gap: 9cqmin;
+}
+
+.cal.month .m-head { grid-area: head; }
+.cal.month .m-grid { grid-area: grid; }
+.cal.month .m-hours { grid-area: hours; }
+
 .m-grid {
   display: grid;
-  grid-template-columns: repeat(7, 5.2cqi);
-  grid-auto-rows: 4.6cqi;
-  gap: 0.6cqi;
+  grid-template-columns: repeat(7, 7.4cqmin);
+  grid-auto-rows: 6.6cqmin;
+  gap: 0.6cqmin;
   place-items: center;
 }
 
 .m-dow {
-  font-size: max(9px, 1cqi);
+  font-size: max(9px, 1cqmin);
   opacity: 0.4;
 }
 
 .m-day {
   position: relative;
-  width: 4.6cqi;
-  height: 4.6cqi;
+  width: 6.4cqmin;
+  height: 6.4cqmin;
   padding: 0;
   border-radius: 50%;
-  font-size: max(10px, 1.25cqi) !important;
+  font-size: max(11px, 1.7cqmin) !important;
 }
 
 .m-day.off {
@@ -132,30 +145,33 @@
 
 .m-hours {
   display: grid;
-  grid-template-columns: repeat(6, 8.6cqi);
-  gap: 0.9cqi;
-  min-height: 8.6cqi;
+  grid-template-columns: repeat(2, 13cqmin);
+  grid-auto-rows: 5.2cqmin;
+  gap: 1.2cqmin;
 }
 
 .m-hour {
-  height: 3.8cqi;
+  height: 5.2cqmin;
   border-radius: 999px;
-  font-size: max(10px, 1.2cqi) !important;
+  font-size: max(11px, 1.6cqmin) !important;
 }
 
 /* ---------- Strip ---------- */
 .st-cols {
+  --cell: 3.7cqmin;
   display: flex;
-  gap: 0.7cqi;
+  gap: 0.8cqmin;
   align-items: end;
+  width: 100%;
+  justify-content: center;
 }
 
 .st-axis {
   display: grid;
-  grid-template-rows: repeat(12, 2.6cqi);
-  gap: 0.45cqi;
-  width: 5cqi;
-  font-size: max(8.5px, 0.95cqi);
+  grid-template-rows: repeat(12, var(--cell));
+  gap: 0.45cqmin;
+  width: 6cqmin;
+  font-size: max(10px, 1.3cqmin);
   opacity: 0.45;
   text-align: right;
 }
@@ -166,30 +182,31 @@
 
 .st-col {
   display: grid;
-  gap: 0.45cqi;
-  width: 4.4cqi;
+  gap: 0.45cqmin;
+  flex: 1;
+  max-width: 7.5cqmin;
   justify-items: stretch;
   text-align: center;
 }
 
 .st-dow {
-  font-size: max(8.5px, 0.95cqi);
+  font-size: max(10px, 1.3cqmin);
   opacity: 0.45;
 }
 
 .st-date {
-  margin-bottom: 0.6cqi;
-  font-size: max(10px, 1.3cqi);
+  margin-bottom: 0.6cqmin;
+  font-size: max(11px, 1.7cqmin);
 }
 
 .st-cell {
-  height: 2.6cqi;
+  height: var(--cell);
   padding: 0;
-  border-radius: 0.6cqi;
+  border-radius: 0.6cqmin;
 }
 
 .st-day {
-  height: calc(31.2cqi + 11 * 0.45cqi);
+  height: calc(12 * var(--cell) + 11 * 0.45cqmin);
   padding: 0;
   border-radius: 999px;
 }
@@ -197,16 +214,22 @@
 /* ---------- Gauge ---------- */
 .g-dates {
   display: flex;
-  gap: 0.6cqi;
+  gap: 0.6cqmin;
+}
+
+.g-dates {
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .g-date {
   display: grid;
-  gap: 0.4cqi;
-  width: 4.2cqi;
-  padding: 0.8cqi 0;
+  gap: 0.4cqmin;
+  width: 5.6cqmin;
+  min-width: 34px;
+  padding: 1cqmin 0;
   border-radius: 999px;
-  font-size: max(9px, 1.05cqi) !important;
+  font-size: max(10px, 1.3cqmin) !important;
 }
 
 .g-date span {
@@ -215,7 +238,7 @@
 
 .g-date b {
   font-weight: inherit;
-  font-size: max(10px, 1.3cqi);
+  font-size: max(11px, 1.7cqmin);
 }
 
 .g-date.on {
@@ -224,17 +247,18 @@
 }
 
 .g-dial {
+  --g: 1cqmin;
   position: relative;
-  width: 42cqi;
-  height: 38cqi;
+  width: calc(60 * var(--g));
+  height: calc(52 * var(--g));
 }
 
 .g-arc {
   position: absolute;
   left: 50%;
   top: 54%;
-  width: 26cqi;
-  height: 26cqi;
+  width: calc(37 * var(--g));
+  height: calc(37 * var(--g));
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background: conic-gradient(from -120deg, rgb(198 206 217 / 0.5) 0 200deg, var(--gold) 200deg 240deg, transparent 240deg);
@@ -246,13 +270,15 @@
   position: absolute;
   left: 50%;
   top: 54%;
-  width: 4.4cqi;
-  height: 4.4cqi;
-  margin: -2.2cqi 0 0 -2.2cqi;
+  width: calc(6 * var(--g));
+  height: calc(6 * var(--g));
+  min-width: 30px;
+  min-height: 30px;
+  translate: -50% -50%;
   padding: 0;
   border-radius: 50%;
-  transform: rotate(var(--a)) translateY(-17.5cqi) rotate(calc(-1 * var(--a)));
-  font-size: max(10px, 1.2cqi) !important;
+  transform: rotate(var(--a)) translateY(calc(-25 * var(--g))) rotate(calc(-1 * var(--a)));
+  font-size: max(11px, 1.6cqmin) !important;
 }
 
 .g-needle {
@@ -260,12 +286,12 @@
   position: absolute;
   left: 50%;
   top: 54%;
-  width: 0.5cqi;
-  height: 12cqi;
-  margin-left: -0.25cqi;
-  border-radius: 0.5cqi;
+  width: calc(0.6 * var(--g));
+  height: calc(17 * var(--g));
+  margin-left: calc(-0.3 * var(--g));
+  border-radius: 0.5cqmin;
   background: linear-gradient(0deg, var(--blue), #9cb9f5);
-  box-shadow: 0 0 1.6cqi rgb(47 102 224 / 0.7);
+  box-shadow: 0 0 1.6cqmin rgb(47 102 224 / 0.7);
   transform-origin: 50% 100%;
   transform: translateY(-100%) rotate(var(--a));
   transition: transform 0.7s cubic-bezier(0.3, 1.6, 0.5, 1);
@@ -276,8 +302,8 @@
   position: absolute;
   left: 50%;
   top: 54%;
-  width: 3cqi;
-  height: 3cqi;
+  width: calc(4 * var(--g));
+  height: calc(4 * var(--g));
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle at 35% 30%, #f3f6fa, #7d8693);
@@ -287,38 +313,44 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 66%;
+  top: 68%;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: max(10px, 1.3cqi);
+  font-size: max(12px, 1.9cqmin);
 }
 
 /* ---------- Agenda ---------- */
 .ag-list {
   display: grid;
-  gap: 1.2cqi;
+  gap: 1.2cqmin;
   width: 100%;
-  max-height: 46cqi;
+  max-height: 100%;
   overflow-y: auto;
-  padding: 1cqi 2cqi 4cqi;
+  padding: 1cqmin 2cqmin 4cqmin;
   box-sizing: border-box;
   scrollbar-width: none;
   -webkit-mask: linear-gradient(180deg, transparent, #000 4%, #000 82%, transparent);
   mask: linear-gradient(180deg, transparent, #000 4%, #000 82%, transparent);
 }
 
+.agenda .c-body {
+  align-self: stretch;
+  min-height: 0;
+  max-width: 150cqmin;
+}
+
 .ag-row {
   display: grid;
-  grid-template-columns: 15cqi 1fr;
+  grid-template-columns: 22cqmin 1fr;
   align-items: center;
-  gap: 2cqi;
-  padding-bottom: 1.2cqi;
+  gap: 2cqmin;
+  padding-bottom: 1.2cqmin;
   border-bottom: 1px solid rgb(198 206 217 / 0.1);
 }
 
 .ag-day {
-  font-size: max(10px, 1.2cqi);
+  font-size: max(11px, 1.5cqmin);
   opacity: 0.7;
 }
 
@@ -328,40 +360,41 @@
   background-clip: text;
   color: transparent;
   opacity: 1;
-  font-size: max(12px, 1.6cqi);
+  font-size: max(13px, 2cqmin);
 }
 
 .ag-times {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.7cqi;
+  gap: 0.7cqmin;
 }
 
 .ag-time {
-  padding: 0.7cqi 1.2cqi 0.6cqi;
+  padding: 1cqmin 1.5cqmin 0.9cqmin;
   border-radius: 999px;
-  font-size: max(9.5px, 1.1cqi) !important;
+  font-size: max(11px, 1.45cqmin) !important;
 }
 
 .ag-whole {
-  height: 4.4cqi;
+  height: 5.6cqmin;
+  min-height: 32px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.16em !important;
-  font-size: max(9.5px, 1.1cqi) !important;
+  font-size: max(11px, 1.45cqmin) !important;
 }
 
 /* ---------- inquiries ---------- */
 .inq {
   display: grid;
-  gap: 3cqi;
-  width: 56cqi;
+  gap: 3.4cqmin;
+  width: min(100%, 80cqmin);
 }
 
 .inq-row {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 3cqi;
+  gap: 3cqmin;
 }
 
 .inq input[type='date'] {
@@ -371,20 +404,20 @@
 .chips {
   display: flex;
   justify-content: center;
-  gap: 1.2cqi;
+  gap: 1.2cqmin;
 }
 
 .chip {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: 1.2cqi 2.4cqi 1.1cqi;
+  padding: 1.2cqmin 2.4cqmin 1.1cqmin;
   border: 1px solid rgb(198 206 217 / 0.45);
   border-radius: 999px;
   background: transparent;
   text-transform: uppercase;
   letter-spacing: 0.16em !important;
-  font-size: max(10px, 1.2cqi) !important;
+  font-size: max(10px, 1.2cqmin) !important;
 }
 
 .chip::before {
@@ -404,4 +437,51 @@
 
 .chip[aria-checked='true']::before {
   clip-path: circle(150% at var(--ix, 50%) var(--iy, 50%));
+}
+
+/* tall portals (phones): the month stacks, the strip shows a week, cells grow with the height */
+@container (orientation: portrait) {
+  .cal {
+    padding: 13cqmin 4cqmin 4cqmin;
+  }
+  .cal.month.opt-sim .c-body {
+    grid-template-columns: auto;
+    grid-template-areas: 'head' 'grid' 'hours';
+    row-gap: 3cqmin;
+  }
+  .m-grid {
+    grid-template-columns: repeat(7, 12.5cqw);
+    grid-auto-rows: 11cqw;
+  }
+  .m-day {
+    width: 10.5cqw;
+    height: 10.5cqw;
+  }
+  .m-hours {
+    grid-template-columns: repeat(4, 21cqw);
+    grid-auto-rows: 9cqw;
+  }
+  .m-hour {
+    height: 9cqw;
+  }
+  .st-cols {
+    --cell: 3.3cqh;
+  }
+  .st-col {
+    max-width: none;
+  }
+  .g-dial {
+    --g: 1.45cqw;
+  }
+  .ag-row {
+    grid-template-columns: 1fr;
+    gap: 1.6cqmin;
+  }
+  .inq-row {
+    grid-template-columns: 1fr;
+  }
+  .c-foot {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }

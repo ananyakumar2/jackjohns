@@ -117,7 +117,8 @@ export function createBooking({ room, exposure, atlas, button, lens, pillars, on
   );
   mesh.layers.enable(REFLECT_LAYER);
 
-  const lensU = { centre: new Vector2(), radius: 300, open: 0 };
+  // box: half width, half height and corner radius when the lens is a rectangle (null when round)
+  const lensU = { centre: new Vector2(), radius: 300, open: 0, box: null };
   const state = { hover: 0, hoverTarget: 0, inkFrom: 0, inkTo: 0, inkAt: -1e9, inkMs: INK_MS, openFrom: 0, openTo: 0, openAt: -1e9, openMs: OPEN_MS, pillar: 0 };
   let pillRect = { x: 0, y: 0, w: PILL.w, h: PILL.h };
   let now = 0;
@@ -207,7 +208,9 @@ export function createBooking({ room, exposure, atlas, button, lens, pillars, on
     // a click anywhere outside the open lens closes it
     outside(x, y) {
       if (!isOpen()) return false;
-      const inLens = Math.hypot(x - lensU.centre.x, y - lensU.centre.y) < lensU.radius;
+      const inLens = lensU.box
+        ? Math.abs(x - lensU.centre.x) < lensU.box.w && Math.abs(y - lensU.centre.y) < lensU.box.h
+        : Math.hypot(x - lensU.centre.x, y - lensU.centre.y) < lensU.radius;
       const inPill = Math.abs(x - pillRect.x) < pillRect.w / 2 && Math.abs(y - pillRect.y) < pillRect.h / 2;
       if (inLens || inPill) return false;
       close();
@@ -228,11 +231,14 @@ export function createBooking({ room, exposure, atlas, button, lens, pillars, on
       });
       lensU.centre.set(layout.lens.x, layout.lens.y);
       lensU.radius = layout.lens.r;
+      const { w, h, cr } = layout.lens;
+      lensU.box = w ? { w: w / 2, h: h / 2, cr } : null;
       Object.assign(lens.style, {
-        left: `${layout.lens.x - layout.lens.r}px`,
-        top: `${layout.lens.y - layout.lens.r}px`,
-        width: `${layout.lens.r * 2}px`,
-        height: `${layout.lens.r * 2}px`,
+        left: `${layout.lens.x - (w ? w / 2 : layout.lens.r)}px`,
+        top: `${layout.lens.y - (h ? h / 2 : layout.lens.r)}px`,
+        width: `${w || layout.lens.r * 2}px`,
+        height: `${h || layout.lens.r * 2}px`,
+        borderRadius: w ? `${cr}px` : '',
       });
     },
     update(dt, t) {

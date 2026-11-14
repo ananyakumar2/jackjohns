@@ -16,14 +16,15 @@
 
 #lens {
   place-content: stretch;
+  container-type: size;
 }
 
 #portal {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
+  border-radius: inherit;
   color: var(--type);
-  font: 600 max(11px, 1.45cqi) / 1 var(--font);
+  font: 600 max(11px, 1.45cqmin) / 1 var(--font);
   letter-spacing: 0.04em;
 }
 
@@ -34,7 +35,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(1.2cqi) scale(0.985);
+    transform: translateY(1.2cqmin) scale(0.985);
   }
 }
 
@@ -63,14 +64,13 @@
 /* ---------- shared pieces ---------- */
 .back {
   position: absolute;
-  top: 5.5cqi;
-  left: 50%;
+  top: 3.6cqmin;
+  left: 3.6cqmin;
   z-index: 3;
-  width: 4.2cqi;
-  height: 4.2cqi;
-  min-width: 28px;
-  min-height: 28px;
-  margin-left: max(-2.1cqi, -14px);
+  width: 4.6cqmin;
+  height: 4.6cqmin;
+  min-width: 30px;
+  min-height: 30px;
   padding: 0;
   border: 1px solid var(--hair);
   border-radius: 50%;
@@ -96,19 +96,20 @@
 
 .optbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.6cqi;
-  padding: 0.5cqi;
+  gap: 0.6cqmin;
+  padding: 0.5cqmin;
   border: 1px solid var(--hair);
   border-radius: 999px;
 }
 
 .optbar button {
-  padding: 1cqi 1.8cqi 0.9cqi;
+  padding: 1cqmin 1.8cqmin 0.9cqmin;
   border: 0;
   border-radius: 999px;
   background: transparent;
-  font-size: max(9.5px, 1.15cqi) !important;
+  font-size: max(9.5px, 1.15cqmin) !important;
   letter-spacing: 0.16em !important;
   text-transform: uppercase;
   white-space: nowrap;
@@ -128,9 +129,9 @@
 
 .legend {
   display: flex;
-  gap: 2.4cqi;
+  gap: 2.4cqmin;
   justify-content: center;
-  font-size: max(9px, 1.05cqi);
+  font-size: max(9px, 1.05cqmin);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   opacity: 0.75;
@@ -139,13 +140,13 @@
 .legend span {
   display: inline-flex;
   align-items: center;
-  gap: 0.9cqi;
+  gap: 0.9cqmin;
 }
 
 .legend span::before {
   content: '';
-  width: 1.3cqi;
-  height: 1.3cqi;
+  width: 1.3cqmin;
+  height: 1.3cqmin;
   min-width: 8px;
   min-height: 8px;
   border-radius: 50%;
@@ -225,7 +226,7 @@
     box-shadow: 0 0 0 0 rgb(216 179 106 / 0.8);
   }
   100% {
-    box-shadow: 0 0 0 1.4cqi rgb(216 179 106 / 0);
+    box-shadow: 0 0 0 1.4cqmin rgb(216 179 106 / 0);
   }
 }
 
@@ -233,14 +234,14 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: 1.5cqi 3.4cqi 1.4cqi;
+  padding: 1.5cqmin 3.4cqmin 1.4cqmin;
   border: 0;
   border-radius: 999px;
   background: var(--silver);
   color: #1b2230 !important;
   text-transform: uppercase;
   letter-spacing: 0.2em !important;
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4), 0 0.6cqi 2cqi rgb(0 0 0 / 0.3);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4), 0 0.6cqmin 2cqmin rgb(0 0 0 / 0.3);
   transition: transform 0.25s var(--ease), opacity 0.25s ease, filter 0.25s ease;
 }
 
@@ -258,13 +259,13 @@
 
 .field {
   display: grid;
-  gap: 0.8cqi;
+  gap: 0.8cqmin;
   min-width: 0;
   text-align: left;
 }
 
 .field > span {
-  font-size: max(9px, 1.05cqi);
+  font-size: max(9px, 1.05cqmin);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   opacity: 0.6;
@@ -274,11 +275,11 @@
 .field textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 1.2cqi 0 1cqi;
+  padding: 1.2cqmin 0 1cqmin;
   border: 0;
   border-bottom: 1px solid rgb(198 206 217 / 0.35);
   background: transparent;
-  font-size: max(12px, 1.6cqi) !important;
+  font-size: max(12px, 1.6cqmin) !important;
   letter-spacing: 0.04em !important;
   outline: none;
   resize: none;
@@ -297,13 +298,13 @@
 
 /* ---------- the email preview, beside the portal ---------- */
 #mail {
+  /* inside the portal, beside the received state */
   position: fixed;
   top: 50%;
-  right: max(18px, 2vw);
+  right: calc(10vw + 4vmin);
   z-index: 2;
-  width: min(380px, calc(50vw - 47vh - 30px));
-  min-width: 300px;
-  max-height: 86vh;
+  width: min(440px, 36vw);
+  max-height: calc(80vh - 8vmin);
   overflow: auto;
   border-radius: 14px;
   opacity: 0;
@@ -322,17 +323,25 @@
   display: none;
 }
 
-@media (max-aspect-ratio: 4/3) {
+#portal.sent > :not(.back) {
+  left: 30%;
+}
+
+@media (max-aspect-ratio: 1/1) {
   #mail {
     top: auto;
-    bottom: 12px;
+    bottom: calc(10vh + 3vmin);
     right: 50%;
-    width: min(380px, 92vw);
-    max-height: 40vh;
+    width: calc(80vw - 6vmin);
+    max-height: 44vh;
     transform: translate(50%, 24px);
   }
   #mail.shown {
     transform: translate(50%, 0);
+  }
+  #portal.sent > :not(.back) {
+    left: 50%;
+    top: 24%;
   }
 }
 
@@ -343,7 +352,10 @@
   right: 10px;
   z-index: 5;
   display: flex;
-  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 10px;
+  max-width: calc(100vw - 20px);
   font: 600 9px / 1 var(--font);
   letter-spacing: 0.16em;
   text-transform: uppercase;

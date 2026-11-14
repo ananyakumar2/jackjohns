@@ -3,7 +3,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 0 1.4cqi;
+  gap: 0 1.4cqmin;
   text-transform: uppercase;
   letter-spacing: 0.16em;
 }
@@ -11,11 +11,11 @@
 .d-line > * + *::before {
   content: '';
   display: inline-block;
-  width: 0.5cqi;
-  height: 0.5cqi;
+  width: 0.5cqmin;
+  height: 0.5cqmin;
   min-width: 3px;
   min-height: 3px;
-  margin-right: 1.4cqi;
+  margin-right: 1.4cqmin;
   border-radius: 50%;
   background: currentColor;
   opacity: 0.5;
@@ -24,7 +24,7 @@
 
 .d-big {
   margin: 0;
-  font-size: max(18px, 3.6cqi);
+  font-size: max(18px, 3.6cqmin);
   font-weight: inherit;
   letter-spacing: 0.3em;
   background: var(--silver);
@@ -38,16 +38,16 @@
   color: var(--gold);
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: max(10px, 1.2cqi);
+  font-size: max(10px, 1.2cqmin);
 }
 
 .d-done {
-  margin-top: 1cqi;
-  padding: 1cqi 2.4cqi;
+  margin-top: 1cqmin;
+  padding: 1cqmin 2.4cqmin;
   border: 1px solid var(--hair);
   border-radius: 999px;
   background: transparent;
-  font-size: max(9.5px, 1.1cqi) !important;
+  font-size: max(9.5px, 1.1cqmin) !important;
   opacity: 0.7;
 }
 
@@ -71,35 +71,35 @@
   top: 50%;
   display: grid;
   justify-items: center;
-  gap: 4cqi;
-  width: 54cqi;
-  padding: 5cqi 5cqi 4.4cqi;
+  gap: 4cqmin;
+  width: 54cqmin;
+  padding: 5cqmin 5cqmin 4.4cqmin;
   box-sizing: border-box;
-  border-radius: 3cqi;
+  border-radius: 3cqmin;
   background: rgb(19 24 33 / 0.55);
   box-shadow: inset 0 0 0 1px rgb(198 206 217 / 0.2);
   transform: translate(-50%, -50%);
 }
 
 .d-card .d-line {
-  font-size: max(11px, 1.5cqi);
+  font-size: max(11px, 1.5cqmin);
 }
 
 .d-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3cqi;
+  gap: 3cqmin;
   width: 100%;
 }
 
 .d-card.sent {
-  gap: 2.4cqi;
+  gap: 2.4cqmin;
 }
 
 .d-check {
   position: relative;
-  width: 9cqi;
-  height: 9cqi;
+  width: 9cqmin;
+  height: 9cqmin;
   border-radius: 50%;
   background: conic-gradient(var(--blue) var(--p, 100%), transparent 0);
   -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
@@ -111,9 +111,9 @@
   content: '';
   position: absolute;
   left: 50%;
-  top: 9.2cqi;
-  width: 2.2cqi;
-  height: 4cqi;
+  top: 9.2cqmin;
+  width: 2.2cqmin;
+  height: 4cqmin;
   border-right: 3px solid var(--type);
   border-bottom: 3px solid var(--type);
   transform: translate(-50%, -50%) rotate(45deg);
@@ -146,25 +146,25 @@
   top: 50%;
   display: grid;
   justify-items: center;
-  gap: 4.4cqi;
-  width: 60cqi;
+  gap: 4.4cqmin;
+  width: 60cqmin;
   transform: translate(-50%, -50%);
 }
 
 .d-steps .d-line {
-  font-size: max(10px, 1.25cqi);
+  font-size: max(10px, 1.25cqmin);
   opacity: 0.7;
 }
 
 .leds {
   display: flex;
-  gap: 1.6cqi;
+  gap: 1.6cqmin;
 }
 
 .leds i,
 .mail-leds i {
-  width: 1.6cqi;
-  height: 1.6cqi;
+  width: 1.6cqmin;
+  height: 1.6cqmin;
   min-width: 9px;
   min-height: 9px;
   border-radius: 50%;
@@ -175,13 +175,13 @@
 
 .leds i.on {
   background: radial-gradient(circle at 40% 35%, #9cb9f5, var(--blue));
-  box-shadow: 0 0 0 1px #c9d0d9, 0 0 1.8cqi rgb(47 102 224 / 0.8);
+  box-shadow: 0 0 0 1px #c9d0d9, 0 0 1.8cqmin rgb(47 102 224 / 0.8);
 }
 
 .leds.done i,
 .mail-leds i {
   background: radial-gradient(circle at 40% 35%, #fbe9b8, var(--gold));
-  box-shadow: 0 0 0 1px #c9d0d9, 0 0 1.8cqi rgb(216 179 106 / 0.7);
+  box-shadow: 0 0 0 1px #c9d0d9, 0 0 1.8cqmin rgb(216 179 106 / 0.7);
 }
 
 .leds.done i:nth-child(2) {
@@ -195,14 +195,14 @@
 .d-q {
   display: grid;
   justify-items: center;
-  gap: 2cqi;
+  gap: 2cqmin;
   width: 100%;
 }
 
 .d-qrow {
   display: flex;
   align-items: center;
-  gap: 2cqi;
+  gap: 2cqmin;
   width: 100%;
   border-bottom: 1px solid rgb(198 206 217 / 0.4);
 }
@@ -210,10 +210,10 @@
 .d-qrow input {
   flex: 1;
   min-width: 0;
-  padding: 1.4cqi 0;
+  padding: 1.4cqmin 0;
   border: 0;
   background: transparent;
-  font-size: max(16px, 3cqi) !important;
+  font-size: max(16px, 3cqmin) !important;
   letter-spacing: 0.02em !important;
   outline: none;
 }
@@ -230,8 +230,8 @@
 .sl-go {
   position: relative;
   flex: none;
-  width: 5cqi;
-  height: 5cqi;
+  width: 5cqmin;
+  height: 5cqmin;
   min-width: 30px;
   min-height: 30px;
   padding: 0;
@@ -255,10 +255,10 @@
 }
 
 .d-skip {
-  padding: 0.6cqi 1.4cqi;
+  padding: 0.6cqmin 1.4cqmin;
   border: 0;
   background: transparent;
-  font-size: max(9.5px, 1.05cqi) !important;
+  font-size: max(9.5px, 1.05cqmin) !important;
   opacity: 0.5;
 }
 
@@ -267,7 +267,7 @@
 }
 
 .d-steps.sent {
-  gap: 2.6cqi;
+  gap: 2.6cqmin;
 }
 
 /* ---------- Pass ---------- */
@@ -281,8 +281,8 @@
 
 .p-card {
   position: relative;
-  width: 38cqi;
-  height: 58cqi;
+  width: 38cqmin;
+  height: 58cqmin;
   transform-style: preserve-3d;
   transition: transform 0.9s cubic-bezier(0.4, 1.3, 0.5, 1);
   animation: swing 1.6s ease-in-out both;
@@ -290,7 +290,7 @@
 
 @keyframes swing {
   0% {
-    transform: rotateZ(-4deg) translateY(-2cqi);
+    transform: rotateZ(-4deg) translateY(-2cqmin);
   }
   45% {
     transform: rotateZ(2deg);
@@ -310,12 +310,12 @@
   display: grid;
   align-content: start;
   justify-items: center;
-  gap: 2.2cqi;
-  padding: 0 4cqi 4cqi;
+  gap: 2.2cqmin;
+  padding: 0 4cqmin 4cqmin;
   border: 1.5px solid transparent;
-  border-radius: 2.4cqi;
+  border-radius: 2.4cqmin;
   background: linear-gradient(rgb(22 28 39), rgb(17 22 31)) padding-box, var(--silver) border-box;
-  box-shadow: 0 3cqi 6cqi rgb(0 0 0 / 0.4);
+  box-shadow: 0 3cqmin 6cqmin rgb(0 0 0 / 0.4);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   text-align: center;
@@ -328,13 +328,13 @@
 
 .p-band {
   position: relative;
-  width: calc(100% + 8cqi);
-  margin-bottom: 2cqi;
-  padding: 5.2cqi 0 2cqi;
-  border-radius: 2.2cqi 2.2cqi 0 0;
+  width: calc(100% + 8cqmin);
+  margin-bottom: 2cqmin;
+  padding: 5.2cqmin 0 2cqmin;
+  border-radius: 2.2cqmin 2.2cqmin 0 0;
   background: linear-gradient(160deg, #3d74ea, #2350b8);
   color: #eef3fb;
-  font-size: max(10px, 1.25cqi);
+  font-size: max(10px, 1.25cqmin);
   letter-spacing: 0.3em;
 }
 
@@ -342,9 +342,9 @@
   content: '';
   position: absolute;
   left: 50%;
-  top: 1.8cqi;
-  width: 7cqi;
-  height: 1.4cqi;
+  top: 1.8cqmin;
+  width: 7cqmin;
+  height: 1.4cqmin;
   border-radius: 999px;
   transform: translateX(-50%);
   background: rgb(17 22 31);
@@ -352,12 +352,12 @@
 }
 
 .p-what {
-  font-size: max(14px, 2.4cqi);
+  font-size: max(14px, 2.4cqmin);
   letter-spacing: 0.14em;
 }
 
 .p-what.small {
-  font-size: max(11px, 1.5cqi);
+  font-size: max(11px, 1.5cqmin);
 }
 
 .p-when {
@@ -367,21 +367,21 @@
 }
 
 .p-price {
-  font-size: max(10px, 1.25cqi);
+  font-size: max(10px, 1.25cqmin);
   opacity: 0.65;
 }
 
 .p-fields {
   display: grid;
-  gap: 2.4cqi;
+  gap: 2.4cqmin;
   width: 100%;
-  margin: 1.4cqi 0 1cqi;
+  margin: 1.4cqmin 0 1cqmin;
 }
 
 .p-holo {
   width: 100%;
-  height: 4cqi;
-  border-radius: 0.8cqi;
+  height: 4cqmin;
+  border-radius: 0.8cqmin;
   background: linear-gradient(100deg, #8e6727, #fbe9b8 30%, #b98c3d 45%, #f0cf86 60%, #8e6727 80%, #fbe9b8);
   background-size: 220% 100%;
   animation: holo 3s linear infinite;
@@ -400,8 +400,8 @@
   top: 50%;
   display: grid;
   justify-items: center;
-  gap: 3cqi;
-  width: 64cqi;
+  gap: 3cqmin;
+  width: 64cqmin;
   transform: translate(-50%, -50%);
 }
 
@@ -409,12 +409,12 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: 2.6cqi 4.4cqi 2.4cqi;
+  padding: 2.6cqmin 4.4cqmin 2.4cqmin;
   border: 1px solid var(--blue);
   border-radius: 999px;
   background: var(--blue);
   color: #eef3fb;
-  font-size: max(12px, 1.8cqi);
+  font-size: max(12px, 1.8cqmin);
   transition: background 0.6s ease, color 0.6s ease, border-color 0.6s ease;
 }
 
@@ -436,16 +436,16 @@
   }
   100% {
     transform: none;
-    box-shadow: 0 0 0 3cqi rgb(216 179 106 / 0);
+    box-shadow: 0 0 0 3cqmin rgb(216 179 106 / 0);
   }
 }
 
 .sl-form {
   display: flex;
   align-items: center;
-  gap: 1.4cqi;
-  width: 44cqi;
-  padding: 0.8cqi 0.8cqi 0.8cqi 3cqi;
+  gap: 1.4cqmin;
+  width: 44cqmin;
+  padding: 0.8cqmin 0.8cqmin 0.8cqmin 3cqmin;
   border: 1px solid rgb(198 206 217 / 0.4);
   border-radius: 999px;
   transition: border-color 0.25s ease;
@@ -460,7 +460,7 @@
   min-width: 0;
   border: 0;
   background: transparent;
-  font-size: max(13px, 1.8cqi) !important;
+  font-size: max(13px, 1.8cqmin) !important;
   letter-spacing: 0.02em !important;
   outline: none;
 }

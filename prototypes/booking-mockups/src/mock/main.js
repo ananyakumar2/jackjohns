@@ -13,19 +13,14 @@ const STAGES = [
   { id: 'details', name: 'Details', variants: DETAILS },
 ];
 
-// The portal is much bigger than on the main page: as large as the screen allows
-// while its rim stays clear of Book, which closes it.
+// The portal is a rectangle, 80% of the screen each way and centred; the page
+// shows round it, and a click there closes it.
 globalThis.redlineHooks = {
   freeze: true,
   layout(layout, view) {
-    const top = layout.pill.y - layout.pill.h / 2 - 14;
-    let r = Math.min(view.W * 0.47, view.H * 0.47);
-    let y = Math.min(layout.helmet.y, top - r);
-    if (y - r < 10) {
-      r = (top - 10) / 2;
-      y = 10 + r;
-    }
-    layout.lens = { x: layout.helmet.x, y, r };
+    const w = Math.round(view.W * 0.8);
+    const h = Math.round(view.H * 0.8);
+    layout.lens = { x: view.W / 2, y: view.H / 2, r: Math.min(w, h) / 2, w, h, cr: Math.round(Math.min(w, h) * 0.035) };
   },
 };
 
@@ -133,10 +128,12 @@ function showMail() {
   mail.replaceChildren(variant.email(summary(), state.details));
   mail.dataset.variant = variant.id;
   mail.hidden = false;
+  portal.classList.add('sent');
   requestAnimationFrame(() => mail.classList.add('shown'));
 }
 
 function hideMail() {
+  portal.classList.remove('sent');
   mail.classList.remove('shown');
   mail.hidden = true;
 }

@@ -68,6 +68,7 @@ uniform vec4 uWake;
 uniform vec3 uHelmet;
 uniform vec4 uPill;
 uniform vec4 uLens;
+uniform vec3 uLensBox; // half width, half height, corner radius; x = 0 keeps the round lens
 uniform float uTime;
 uniform vec3 uView;
 uniform float uFade;
@@ -133,7 +134,35 @@ void main() {
   vec3 rimCol = vec3(0.0);
   vec3 fringe = vec3(0.0);
 
-  if (uLens.w > 0.001) {
+  if (uLens.w > 0.001 && uLensBox.x > 0.0) {
+    // the same lens as a rounded rectangle: it grows from the centre, its rim
+    // bends the page around it, and the inside is the same smoked glass
+    vec2 d = px - uLens.xy;
+    float o = uLens.w;
+    vec2 hb = max(uLensBox.xy * o, vec2(1.0));
+    float cr = min(uLensBox.z, min(hb.x, hb.y));
+    float a = atan(d.y, d.x);
+    float wob = 2.0 * (sin(3.0 * a + 0.7 * uTime) * 0.6 + sin(5.0 * a - 0.45 * uTime) * 0.4) * o;
+    float s = sdBox(d, hb - cr) - cr - wob;
+    float sc = min(uLensBox.x, uLensBox.y);
+    if (s > 0.0) {
+      float w = exp(-s / (sc * 0.12));
+      vec2 pull = d * (1.0 - 0.5 * w);
+      pull += (vnoise(vec2(a * 6.0, uTime * 1.6)) - 0.5) * 3.0 * w;
+      suv = (uLens.xy + pull) / uCss;
+      fringe = heatTint(a * 0.16 + uTime * 0.04 + s / 60.0) * exp(-s / 7.0) * 0.16 * o;
+    } else {
+      lensIn = (1.0 - smoothstep(-2.0, 0.0, s)) * smoothstep(0.0, 0.4, o);
+      suv = (uLens.xy + d * 0.92) / uCss;
+    }
+    vec2 e = vec2(1.0, 0.0);
+    vec2 g = vec2(sdBox(d + e.xy, hb - cr) - sdBox(d - e.xy, hb - cr), sdBox(d + e.yx, hb - cr) - sdBox(d - e.yx, hb - cr));
+    vec2 gd = g / max(length(g), 1e-4);
+    float b = clamp(s / 1.7, -1.0, 1.0);
+    vec3 n = normalize(vec3(gd * b * 1.2, sqrt(max(1.0 - b * b, 0.03))));
+    rimCol = toDisplay(chromeShade(roomPoint(uv), n, vec3(0.0, 0.0, 1.0), SILVER, 0.004, 0.15) * 1.15);
+    rim = (1.0 - smoothstep(1.0, 2.2, abs(s))) * smoothstep(0.0, 0.15, o);
+  } else if (uLens.w > 0.001) {
     vec2 d = px - uLens.xy;
     float t = length(d) + 1e-3;
     float a = atan(d.y, d.x);
@@ -282,6 +311,7 @@ export function createHaze(renderer, room, { enabled = true } = {}) {
     uHelmet: { value: new Vector3() },
     uPill: { value: new Vector4() },
     uLens: { value: new Vector4() },
+    uLensBox: { value: new Vector3() },
     uTime: { value: 0 },
     uView: { value: new Vector3() },
     uFade: { value: 0 },

@@ -185,7 +185,7 @@ function strip(root, ctx) {
   return frame(root, ctx, 'strip', (body, update) => {
     const sim = ctx.state.option === 'sim';
     let from = 0;
-    const N = 10;
+    const N = root.clientWidth > root.clientHeight ? 14 : 7;
     const cols = el('div', { class: 'st-cols' });
     const nav = el('div', { class: 'st-nav' });
     const draw = () => {
@@ -257,7 +257,7 @@ function gauge(root, ctx) {
       paint(dial, ctx.state.option);
     };
     if (sim) {
-      for (const d of days.slice(0, 12)) {
+      for (const d of days.slice(0, root.clientWidth > root.clientHeight ? 14 : 7)) {
         const b = slotBtn({ class: 'g-date', 'data-key': d.key, 'aria-label': fmtDay(d.date) }, el('span', { text: d.date.toLocaleDateString('en-GB', { weekday: 'narrow' }) }), el('b', { text: d.date.getDate() }));
         b.addEventListener('click', () => {
           if (b.disabled) return;
@@ -315,7 +315,7 @@ function agenda(root, ctx) {
 
 export const CALENDARS = [
   { id: 'month', name: 'Month', idea: 'A month grid: each day shows how full it is; a sim day opens its hours', render: month },
-  { id: 'strip', name: 'Strip', idea: 'Ten days side by side: hours are cells, a track day is the whole column', render: strip },
+  { id: 'strip', name: 'Strip', idea: 'Two weeks side by side (one on a phone): hours are cells, a track day is the whole column', render: strip },
   { id: 'gauge', name: 'Gauge', idea: 'A rev counter: the needle swings to the hour or the day', render: gauge },
   { id: 'agenda', name: 'Agenda', idea: 'Soonest first, like a race calendar; the next opening leads', render: agenda },
 ];

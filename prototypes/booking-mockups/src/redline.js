@@ -305,6 +305,8 @@ function update(dt, now) {
   busy = booking.update(dt, now) || busy;
   const lens = booking.lens;
   hu.uLens.value.set(lens.centre.x, view.H - lens.centre.y, lens.radius, lens.open);
+  if (lens.box) hu.uLensBox.value.set(lens.box.w, lens.box.h, lens.box.cr);
+  else hu.uLensBox.value.set(0, 0, 0);
 
   haze.feed(pointer, dt, redline);
   busy = haze.update(dt) || busy;
@@ -338,7 +340,11 @@ function overHelmet(cx, cy) {
 }
 
 const ndc = (x, y) => [(x / view.W) * 2 - 1, -((y / view.H) * 2 - 1)];
-const inLens = (x, y) => booking.isOpen() && Math.hypot(x - booking.lens.centre.x, y - booking.lens.centre.y) < booking.lens.radius;
+const inLens = (x, y) => {
+  if (!booking.isOpen()) return false;
+  const { centre: c, box, radius } = booking.lens;
+  return box ? Math.abs(x - c.x) < box.w && Math.abs(y - c.y) < box.h : Math.hypot(x - c.x, y - c.y) < radius;
+};
 
 addEventListener('pointermove', (e) => {
   if (drag && e.pointerId === drag.id) {
