@@ -8,12 +8,6 @@
   font-weight: 400;
 }
 @font-face {
-  font-family: 'JJ Helvetica Now Display';
-  src: local('Helvetica Now Display Bold'), local('HelveticaNowDisplay-Bold'), local('Helvetica Neue Bold'),
-    local('HelveticaNeue-Bold'), local('Helvetica Bold'), local('Helvetica-Bold');
-  font-weight: 700;
-}
-@font-face {
   font-family: 'JJ Helvetica Now Text';
   src: local('Helvetica Now Text'), local('HelveticaNowText-Regular'), local('Helvetica Now Text Regular'),
     local('Helvetica Now Display'), local('HelveticaNowDisplay-Regular'), local('Helvetica Neue'), local('HelveticaNeue'),
@@ -21,21 +15,9 @@
   font-weight: 400;
 }
 @font-face {
-  font-family: 'JJ Helvetica Now Text';
-  src: local('Helvetica Now Text Bold'), local('HelveticaNowText-Bold'), local('Helvetica Neue Bold'),
-    local('HelveticaNeue-Bold'), local('Helvetica Bold'), local('Helvetica-Bold');
-  font-weight: 700;
-}
-@font-face {
   font-family: 'Heros';
   src: url('fonts/texgyreheros-regular.woff2') format('woff2');
   font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Heros';
-  src: url('fonts/texgyreheros-bold.woff2') format('woff2');
-  font-weight: 700;
   font-display: swap;
 }
 @font-face {
