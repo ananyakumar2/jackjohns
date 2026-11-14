@@ -28,6 +28,15 @@ These URL parameters are for testing and are off by default:
 | `?yaw=40&pitch=10` | Holds the head at a fixed angle (for stills) |
 | `?capture` | Steps frames on a fixed clock for an external recorder (used for the proof video on a machine without a GPU) |
 
+## Booking mockups (`booking.html`)
+
+The same hero with the booking flow mocked inside a much bigger portal: `booking.html` next to `index.html` (dev: `http://localhost:5173/booking.html`). While the portal is open the page behind it is frozen; everything resumes on close. The main page sets none of this and is unchanged.
+
+- **Switcher** (top right, faint until hovered): the stage (Portal, Calendar, Details), the four ideas for that stage, and `AED` to hide or show prices. Choosing one opens the portal at that stage; picking through the portal walks the whole flow with the idea chosen for each stage. The URL keeps the choice, for example `booking.html?stage=calendar&portal=gate&calendar=gauge&details=pass`; `&prices=0` hides prices.
+- **Data** is mocked in `src/mock/data.js` (six weeks, one-hour sim slots 10:00–22:00, free, held or booked) and changes on its own every few seconds to show live availability. Sending a request holds its slot.
+- **Code**: `src/mock/` (`main.js` flow and switcher, `portals.js`, `calendars.js`, `details.js` with the matching emails, a CSS file each). `redline.js` reads two optional hooks from `globalThis.redlineHooks`: `freeze` and `layout`.
+- **Type**: every mockup font goes through `--font` in `src/mock/mock.css`.
+
 ## What it does
 
 - **Stage.** A night pit garage: a wall in Jack's blue in deep shade, a soft light pool behind the helmet, and a wet floor that reflects the cards, the arc and the pill with a streaky, patchy smear. The wall picks up the colour of the card that's awake.
