@@ -38,7 +38,7 @@ export const days = [];
     const busy = r();
     for (const h of HOURS) {
       const x = r();
-      hours[h] = busy < 0.35 ? 'free' : x < 0.16 ? 'booked' : x < 0.27 ? 'held' : 'free';
+      hours[h] = busy < 0.62 ? 'free' : x < 0.13 ? 'booked' : x < 0.22 ? 'held' : 'free';
     }
     const day = { key: dayKey(date), date, hours, track: null };
     // a whole-day booking takes every hour of the day

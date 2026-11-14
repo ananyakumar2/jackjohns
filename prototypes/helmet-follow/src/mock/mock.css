@@ -1,5 +1,7 @@
 /* Booking mockups. Same palette as the hero: Jack's blue, silver and gold chrome on the stage blue. */
 :root {
+  /* the one typeface switch for every booking mockup, emails included */
+  --font: 'Archivo Expanded', system-ui, sans-serif;
   --gold: #d8b36a;
   --gold-dim: rgb(216 179 106 / 0.55);
   --silver: linear-gradient(180deg, #f3f6fa 0%, #a9b2be 46%, #e4e9f0 54%, #7d8693 100%);
@@ -21,8 +23,7 @@
   inset: 0;
   border-radius: 50%;
   color: var(--type);
-  font: var(--type-font);
-  font-size: max(11px, 1.45cqi);
+  font: 600 max(11px, 1.45cqi) / 1 var(--font);
   letter-spacing: 0.04em;
 }
 
@@ -307,7 +308,7 @@
   opacity: 0;
   transform: translate(24px, -50%);
   transition: opacity 0.5s ease, transform 0.7s var(--ease);
-  font: 400 13px / 1.55 system-ui, sans-serif;
+  font: 400 13px / 1.55 var(--font);
   color: #2a3140;
   box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
 }
@@ -361,8 +362,7 @@
   z-index: 5;
   display: flex;
   gap: 10px;
-  font: var(--type-font);
-  font-size: 9px;
+  font: 600 9px / 1 var(--font);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   opacity: 0.38;
