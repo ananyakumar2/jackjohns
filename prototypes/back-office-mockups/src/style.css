@@ -35,6 +35,7 @@
   --chrome-gold: linear-gradient(140deg, #fbedbf 0%, #cfa24a 40%, #f6dc93 54%, #a87c2c 80%, #ecd08a 100%);
   --chrome-blue: linear-gradient(140deg, #8fb2ff 0%, #2f66e0 42%, #6f9bff 56%, #2753c4 82%, #5d8dff 100%);
   --hatch: repeating-linear-gradient(135deg, rgb(183 192 205 / 0.16) 0 5px, transparent 5px 10px);
+  /* The only place the typeface is named; everything else reads var(--font). */
   --font: 'Archivo Expanded', system-ui, sans-serif;
   --r: 12px;
   --r-sm: 8px;
