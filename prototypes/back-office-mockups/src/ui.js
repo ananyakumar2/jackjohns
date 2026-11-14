@@ -91,6 +91,7 @@ export function actionsFor(b, { compact = false, labels = true } = {}) {
     out.push(btn('unlock', 'unlock', 'Unlock', 'btn-ghost'));
   } else if (s === 'paid') {
     out.push(btn('unpaid', 'undo', 'Undo paid', 'btn-ghost'));
+    out.push(btn('unlock', 'unlock', 'Unlock', 'btn-ghost'));
   } else if (s === 'unlocked' && end(b) > TODAY) {
     out.push(btn('relock', 'lock', 'Lock again', 'btn-ghost'));
   }

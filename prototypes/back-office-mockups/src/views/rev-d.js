@@ -122,8 +122,8 @@ export default {
           </div>
           <article class="panel vd-sheet">
             <div class="vd-title">
-              <div><span class="label">${KINDS[u.kind]} report</span><h2>${p.label}</h2></div>
-              <span class="small dim">${open ? 'In progress · ' : ''}${fmt.dm(p.from)} – ${fmt.date(addDays(p.to, -1))}</span>
+              <h2>${p.label}</h2>
+              <span class="small dim">${KINDS[u.kind]} · ${fmt.dm(p.from)} – ${fmt.date(addDays(p.to, -1))}${open ? ' · in progress' : ''}</span>
             </div>
 
             <div class="vd-sum">
@@ -141,8 +141,8 @@ export default {
 
             <div class="vd-h"><span class="label">${u.kind === 'month' ? 'Week by week' : 'Month by month'}</span></div>
             <table class="vd-t">
-              <thead><tr><th>${u.kind === 'month' ? 'Week' : 'Month'}</th><th>Bookings</th><th class="hp">Potential</th><th>Confirmed</th><th>Paid</th></tr></thead>
-              <tbody>${breakdown(p, u.kind).map((r) => `<tr><td>${r.label}</td><td>${r.t.active}</td><td class="hp dim">${aed(r.t.potential)}</td><td class="blue-t">${aed(r.t.confirmed)}</td><td class="gold-t">${aed(r.t.paid)}</td></tr>`).join('')}</tbody>
+              <thead><tr><th>${u.kind === 'month' ? 'Week' : 'Month'}</th><th class="hp">Bookings</th>${SERVICE_ORDER.map((s) => `<th class="${s === 'sim' || s === 'track' ? '' : 'hp'}"><span class="sw sw-${s}" style="margin-right:6px"></span>${SERVICES[s].short}</th>`).join('')}<th>Paid</th></tr></thead>
+              <tbody>${(() => { const rows = breakdown(p, u.kind); return rows.map((r) => `<tr><td>${r.label}</td><td class="hp">${r.t.active}</td>${SERVICE_ORDER.map((s) => { const v = r.t.byService[s].paid; const best = v && v === Math.max(...rows.map((x) => x.t.byService[s].paid)); return `<td class="${s === 'sim' || s === 'track' ? '' : 'hp'} ${best ? 'hi' : 'dim'}">${v ? aed(v) : '—'}${best && rows.length > 1 ? ' ▲' : ''}</td>`; }).join('')}<td class="gold-t">${aed(r.t.paid)}</td></tr>`).join(''); })()}</tbody>
             </table>
 
             ${t.paid ? `<p class="vd-note">${SERVICES[top].name} led ${p.label} with AED ${aed(t.byService[top].paid)} paid${tp.byService[top].paid ? `, against AED ${aed(tp.byService[top].paid)} in ${prev.label}` : ''}.</p>` : ''}

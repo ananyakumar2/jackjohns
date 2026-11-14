@@ -74,7 +74,9 @@ export function generate() {
   const r = rng(20261114);
   const pick = (a) => a[Math.floor(r() * a.length)];
   // Regulars come back: weight the first names more heavily.
-  const person = () => PEOPLE[Math.min(PEOPLE.length - 1, Math.floor(Math.pow(r(), 1.7) * PEOPLE.length))];
+  // The last name is a newcomer whose first request is below, so keep him out of history.
+  const pool = PEOPLE.slice(0, -1);
+  const person = () => pool[Math.min(pool.length - 1, Math.floor(Math.pow(r(), 1.7) * pool.length))];
 
   const items = [];
   const fullDays = new Set();
@@ -132,7 +134,7 @@ export function generate() {
   // Hand-written near-term items; the message threads refer to these by id.
   const T = TODAY;
   const fixed = [
-    { id: 'r1', service: 'sim', client: 'Omar Haddad', start: at(2026, 10, 16, 18), hours: 2, status: 'tentative', created: at(2026, 10, 13, 21, 40), note: 'First time on a rig. Drives a Golf R on weekends.' },
+    { id: 'r1', service: 'sim', client: 'Ahmed Fathy', start: at(2026, 10, 16, 18), hours: 2, status: 'tentative', created: at(2026, 10, 13, 21, 40), note: 'First time on a rig. Drives a Golf R on weekends.' },
     { id: 'r2', service: 'track', client: 'Priya Nair', start: at(2026, 10, 28, 8), venue: 'Yas Marina Circuit', status: 'tentative', created: at(2026, 10, 14, 9, 12), note: 'Own car, GR86 on track tyres.' },
     { id: 'r3', service: 'sim', client: 'Lukas Brandt', start: at(2026, 10, 17, 19), hours: 1, status: 'tentative', created: at(2026, 10, 14, 7, 55), note: 'Wants to work on Spa in ACC.' },
     { id: 'r4', service: 'sim', client: 'Zara Sheikh', start: at(2026, 10, 21, 11), hours: 1, status: 'tentative', created: at(2026, 10, 12, 16, 3) },
@@ -255,7 +257,7 @@ function threads(items) {
     T('t3', 'Rania Fares', 'c1', [
       ['client', 1140, 'Hello Jack, Gulf Endurance Series here. We are looking for a co-commentator alongside our lead for the Gulf 12 Hours, 11 and 12 December, both stints. Could you share your day rate and availability?'],
     ]),
-    T('t4', 'Omar Haddad', 'r1', [
+    T('t4', 'Ahmed Fathy', 'r1', [
       ['client', 760, 'Hey! First time on a proper rig. Anything I should bring? I usually drive in trainers, is that ok?'],
     ]),
     T('t5', 'Karim Nasser', 'rc1', [

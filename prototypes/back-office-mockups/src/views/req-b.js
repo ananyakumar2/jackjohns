@@ -106,7 +106,7 @@ export default {
       <div class="rb-pd only-phone">${phoneDays || '<div class="empty">Nothing to confirm</div>'}</div>
 
       ${sel ? `<aside class="rb-sheet">
-        <div class="row between"><span class="label">${esc(what(sel))}</span><button class="btn btn-icon btn-ghost" data-ui="sel:null" aria-label="Close">${icon('close')}</button></div>
+        <div class="row" style="justify-content:flex-end"><button class="btn btn-icon btn-ghost" data-ui="sel:null" aria-label="Close">${icon('close')}</button></div>
         ${card(sel, { selected: false })}
         ${sel.email ? `<div class="panel pad small stack"><div class="row">${icon('mail')}<span>${esc(sel.email)}</span></div><div class="row">${icon('chat')}<a class="blue-t" href="#/messages">Open conversation</a></div></div>` : ''}
       </aside>` : ''}

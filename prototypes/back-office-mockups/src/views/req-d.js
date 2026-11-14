@@ -29,6 +29,13 @@ const css = `
 .gate[data-pos="3"] .knob { transform: translateX(186px); background: var(--chrome-gold); }
 .gate.due { border-color: var(--gold); }
 .rd-due { color: var(--gold); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+.rd-cal { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 4px; margin-bottom: 8px; padding: 10px; border-radius: var(--r); background: var(--panel); border: 1px solid var(--line); }
+.rd-cal button { all: unset; cursor: pointer; display: grid; gap: 3px; justify-items: center; align-content: start; padding: 6px 2px 7px; border-radius: 8px; min-height: 74px; }
+.rd-cal button:hover { background: var(--silver-soft); }
+.rd-cal button.today { background: var(--blue-soft); }
+.rd-cal .n { font-size: 14px; color: var(--type-hi); }
+.rd-cal .blk { width: 100%; height: 6px; padding: 0; border-radius: 3px; }
+.rd-cal .wd { font-size: 9px; color: var(--faint); letter-spacing: 0.08em; text-transform: uppercase; }
 .rd-top { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 8px; }
 .rd-top button { all: unset; cursor: pointer; padding: 14px 16px; border-radius: var(--r); background: var(--panel); border: 1px solid var(--line); display: grid; gap: 4px; }
 .rd-top button.on { border-color: var(--blue); }
@@ -41,6 +48,8 @@ const css = `
   .gate[data-pos="2"] .knob { transform: translateX(200%); }
   .gate[data-pos="3"] .knob { transform: translateX(300%); }
   .rd-top { gap: 6px; }
+  .rd-cal { grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 6px; }
+  .rd-cal button { min-height: 58px; }
   .rd-top button { padding: 10px 12px; }
 }
 `;
@@ -114,8 +123,19 @@ export default {
           <button class="${u.f === 'ask' ? 'on' : ''}" data-ui="f:ask"><span class="label">To confirm</span><span class="big">${p.length}</span></button>
           <button class="${u.f === 'due' ? 'on' : ''}" data-ui="f:due"><span class="label">Cash due</span><span class="big gold-t">${aed(due.reduce((s, b) => s + value(b), 0), { short: true })}</span></button>
         </div>
-        ${groups.map((g) => `<div class="rd-day"><span class="hi">${dayName(g.d)}</span>${u.f === 'next' ? '' : `<span class="dim small">${fmt.dm(g.d)}</span>`}</div>${g.items.map(item).join('')}`).join('') || '<div class="empty">Nothing here</div>'}
+        <div class="rd-cal">${[...Array(14)].map((_, i) => {
+          const d = addDays(today, i);
+          const its = store.items.filter((b) => (isActive(b) || state(b) === 'paid') && startOfDay(b.start) <= d && addDays(startOfDay(b.start), b.days - 1) >= d);
+          return `<button class="${i === 0 ? 'today' : ''}" data-ui="f:next;jump:${d.getTime()}" title="${fmt.dayLong(d)}"><span class="wd">${fmt.day(d).slice(0, 2)}</span><span class="n">${d.getDate()}</span>${its.slice(0, 4).map((b) => `<span class="blk ${state(b)}"></span>`).join('')}</button>`;
+        }).join('')}</div>
+        ${groups.map((g) => `<div class="rd-day" data-day="${g.k}"><span class="hi">${dayName(g.d)}</span>${u.f === 'next' ? '' : `<span class="dim small">${fmt.dm(g.d)}</span>`}</div>${g.items.map(item).join('')}`).join('') || '<div class="empty">Nothing here</div>'}
       </div>
     </div>`;
+  },
+  after(root, u) {
+    if (!u.jump) return;
+    const el = root.querySelector(`[data-day="${u.jump}"]`);
+    u.jump = null;
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
   },
 };
