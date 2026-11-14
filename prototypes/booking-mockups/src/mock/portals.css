@@ -397,3 +397,31 @@
 .t-row:focus-visible::before {
   clip-path: circle(150% at var(--ix, 0) var(--iy, 50%));
 }
+
+/* tall portals (phones): names fit their quarter, and the wheel's names sit above and below it */
+@container (orientation: portrait) {
+  .q-text {
+    max-width: calc(100% - 9cqmin);
+  }
+  .q0 .q-text, .q1 .q-text { top: 6cqmin; }
+  .q2 .q-text, .q3 .q-text { bottom: 6cqmin; }
+  .q0 .q-text, .q2 .q-text { left: 5cqmin; }
+  .q1 .q-text, .q3 .q-text { right: 5cqmin; }
+  .q-name {
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+  .w-cap {
+    width: 9cqw;
+    height: 9cqw;
+  }
+  .w-label {
+    position: absolute;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+  }
+  .w-btn.l .w-label { left: -12cqmin; }
+  .w-btn.r .w-label { right: -12cqmin; text-align: right; }
+  .w-btn.n0 .w-label { bottom: calc(100% + 38cqmin); }
+  .w-btn.n1 .w-label { top: calc(100% + 38cqmin); }
+}

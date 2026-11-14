@@ -587,3 +587,17 @@
   margin-top: 6px;
   color: var(--gold);
 }
+
+@container (orientation: portrait) {
+  .d-card,
+  .d-steps {
+    width: 86cqw;
+  }
+  .p-card {
+    width: 66cqw;
+    height: min(104cqw, 62cqh);
+  }
+  .sl {
+    width: 92cqw;
+  }
+}

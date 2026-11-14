@@ -333,7 +333,7 @@
     bottom: calc(10vh + 3vmin);
     right: 50%;
     width: calc(80vw - 6vmin);
-    max-height: 44vh;
+    max-height: 40vh;
     transform: translate(50%, 24px);
   }
   #mail.shown {
@@ -341,7 +341,12 @@
   }
   #portal.sent > :not(.back) {
     left: 50%;
-    top: 24%;
+    top: 26%;
+    scale: 0.72;
+  }
+  #gl.ready ~ #book[aria-expanded='true'] {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
@@ -375,10 +380,7 @@
   right: 10px;
   z-index: 5;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0 10px;
-  max-width: calc(100vw - 20px);
+  gap: 10px;
   font: 600 9px / 1 var(--font);
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -450,5 +452,14 @@
   #mail {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+@container (orientation: portrait) {
+  .optbar {
+    border-radius: 18px;
+  }
+  .optbar button {
+    padding: 9px 11px 8px;
   }
 }
