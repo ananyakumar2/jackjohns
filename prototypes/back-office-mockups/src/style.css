@@ -379,7 +379,7 @@ textarea.reply:focus, input.field:focus { outline: none; border-color: var(--blu
 
 .rv {
   position: fixed;
-  right: 14px;
+  left: 14px;
   bottom: 14px;
   z-index: 50;
   display: flex;
@@ -413,7 +413,7 @@ textarea.reply:focus, input.field:focus { outline: none; border-color: var(--blu
 .rv .ic { width: 15px; height: 15px; }
 .rv-idea {
   position: fixed;
-  right: 14px;
+  left: 14px;
   bottom: 52px;
   z-index: 50;
   max-width: 340px;
@@ -476,7 +476,7 @@ body.embed .rv, body.embed .rv-idea { display: none; }
   .head h1 { font-size: 13px; }
   .big { font-size: 22px; }
   .huge { font-size: 30px; }
-  .rv { right: 8px; bottom: 76px; }
+  .rv { left: auto; right: 8px; bottom: 76px; }
   .rv-l { display: none; }
   .rv-idea { display: none; }
   .hide-phone { display: none !important; }
