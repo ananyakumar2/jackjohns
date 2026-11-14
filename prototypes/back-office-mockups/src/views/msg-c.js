@@ -5,7 +5,7 @@ import { last, booking, title, msgCss } from './msgs.js';
 
 const css = `
 ${msgCss}
-.mc { max-width: 780px; margin: 0 auto; }
+.mc { max-width: 780px; margin: 0 auto; overflow-x: clip; }
 .mc-lights { display: flex; gap: 6px; justify-content: center; margin: 4px 0 22px; }
 .mc-lights i { width: 26px; height: 8px; border-radius: 4px; background: rgb(198 206 217 / 0.08); transition: background 0.3s; }
 .mc-lights i.done { background: var(--chrome-gold); }
