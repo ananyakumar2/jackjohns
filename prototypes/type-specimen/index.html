@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-type="helvetica-now">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#131821" />
+    <title>Jack Johns</title>
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="fonts/texgyreheros-regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="media/helmet.webp" as="image" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      {
+        const t = location.hash.slice(1);
+        if (['helvetica-now', 'heros', 'archivo', 'syne'].includes(t)) document.documentElement.dataset.type = t;
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1 class="name">Jack Johns</h1>
+        <a class="pillar" style="grid-area: sl" href="#sim-racing">Sim Racing</a>
+        <a class="pillar right" style="grid-area: rr" href="#racing">Racing</a>
+        <a class="pillar" style="grid-area: cl" href="#commentating">Commentating</a>
+        <a class="pillar right" style="grid-area: co" href="#coaching">Coaching</a>
+        <div class="cards">
+          <div class="card tl"><img src="media/sim-racing.webp" alt="" style="--fx: 56%" /></div>
+          <div class="card tr"><img src="media/racing.webp" alt="" /></div>
+          <div class="card bl"><img src="media/commentating.webp" alt="" style="--fx: 58%" /></div>
+          <div class="card br"><img src="media/coaching.webp" alt="" style="--fx: 60%" /></div>
+          <img class="helmet" src="media/helmet.webp" alt="" width="800" height="800" />
+        </div>
+        <a class="book" href="#book"><span>Book</span></a>
+      </section>
+
+      <section class="portal" id="book" aria-label="Book">
+        <div class="panel">
+          <div class="options" role="radiogroup" aria-label="Options">
+            <button class="option" type="button" role="radio" aria-checked="true" data-kind="book">
+              <span class="opt-name">Sim coaching</span>
+              <span class="opt-price"><b>AED 500</b> per hour</span>
+            </button>
+            <button class="option" type="button" role="radio" aria-checked="false" data-kind="book">
+              <span class="opt-name">Track day</span>
+              <span class="opt-price"><b>AED 2,500</b> per day</span>
+            </button>
+            <button class="option" type="button" role="radio" aria-checked="false" data-kind="inquire">
+              <span class="opt-name">Commentating</span>
+              <span class="opt-price">On inquiry</span>
+            </button>
+            <button class="option" type="button" role="radio" aria-checked="false" data-kind="inquire">
+              <span class="opt-name">Racing</span>
+              <span class="opt-price">On inquiry</span>
+            </button>
+          </div>
+
+          <div class="detail" data-for="book">
+            <div class="chips days">
+              <button type="button" class="chip">Mon 16</button>
+              <button type="button" class="chip picked">Tue 17</button>
+              <button type="button" class="chip">Wed 18</button>
+              <button type="button" class="chip" disabled>Thu 19</button>
+              <button type="button" class="chip">Fri 20</button>
+            </div>
+            <div class="chips times">
+              <button type="button" class="chip">10:00</button>
+              <button type="button" class="chip picked">14:00</button>
+              <button type="button" class="chip" disabled>16:00</button>
+              <button type="button" class="chip">19:00</button>
+            </div>
+            <div class="send">
+              <input type="email" placeholder="Email" aria-label="Email" />
+              <button type="button" class="go">Book</button>
+            </div>
+          </div>
+
+          <div class="detail" data-for="inquire" hidden>
+            <textarea rows="3" placeholder="Message" aria-label="Message"></textarea>
+            <div class="send">
+              <input type="email" placeholder="Email" aria-label="Email" />
+              <button type="button" class="go">Inquire</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="office" aria-label="Accounts">
+        <dl class="figures">
+          <div><dt>Bookings</dt><dd>38</dd></div>
+          <div><dt>Revenue</dt><dd><small>AED</small> 64,500</dd></div>
+          <div><dt>Confirmed</dt><dd><small>AED</small> 51,000</dd></div>
+          <div class="paid"><dt>Paid</dt><dd><small>AED</small> 42,000</dd></div>
+        </dl>
+      </section>
+    </main>
+
+    <nav class="switcher" aria-label="Typeface">
+      <button type="button" data-type="helvetica-now">Helvetica Now</button>
+      <button type="button" data-type="heros">Heros</button>
+      <button type="button" data-type="archivo">Archivo + Heros</button>
+      <button type="button" data-type="syne">Syne + Heros</button>
+    </nav>
+
+    <details class="credits">
+      <summary>Credits</summary>
+      <ul>
+        <li>Helmet: <a href="https://sketchfab.com/3d-models/f1-helmet-zhouguanyu-24-1124fa1f754645d7b9d54de84009d463" target="_blank" rel="noopener">“F1 Helmet ZhouGuanyu 24”</a> by Miopass, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified and rendered</li>
+        <li>Racing: <a href="https://commons.wikimedia.org/wiki/File:2023_TCR_World_Tour_at_El_Pinar_-_Afternoon_race_Video_01.webm" target="_blank" rel="noopener">“2023 TCR World Tour at El Pinar”</a> by NaBUru38, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, still frame</li>
+        <li>Sim racing: Tima Miroshnichenko, Pexels. Commentating, coaching: Mixkit</li>
+        <li>Type: TeX Gyre Heros (GUST e-foundry, GUST Font License), Archivo (Omnibus-Type, SIL OFL), Syne (Bonjour Monde, SIL OFL)</li>
+      </ul>
+    </details>
+
+    <script src="specimen.js" defer></script>
+  </body>
+</html>
