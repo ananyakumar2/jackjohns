@@ -21,6 +21,8 @@ const params = new URLSearchParams(location.search);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coarse = matchMedia('(hover: none), (pointer: coarse)').matches;
 const canvas = document.getElementById('gl');
+// set by other pages that reuse this hero (booking.html); the main page sets none
+const hooks = globalThis.redlineHooks ?? {};
 
 // ?capture: frames are stepped on a fixed clock by an external driver (proof videos on machines without a GPU)
 const capture = params.has('capture') ? { now: 0 } : null;
@@ -79,6 +81,8 @@ const booking = createBooking({
 });
 // drawn over the finished frame, so neither the haze nor the lens can bend or copy it
 const front = new Scene().add(booking.mesh);
+const frozen = () => !!hooks.freeze && booking.isOpen();
+hooks.booking = booking;
 
 const halfFloatOK = renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float');
 const haze = createHaze(renderer, room, { enabled: !reduced && halfFloatOK && params.get('haze') !== '0' });
@@ -154,6 +158,7 @@ function resize() {
   camera.updateProjectionMatrix();
   camera.updateMatrixWorld();
   layout = computeLayout(view);
+  hooks.layout?.(layout, view);
 
   const pw = Math.round(w * dpr);
   const ph = Math.round(h * dpr);
@@ -252,7 +257,7 @@ function pointerVelocity(now) {
 
 function update(dt, now) {
   let busy = false;
-  if (touch.enabled) busy = touchTour(now) || busy;
+  if (touch.enabled && !frozen()) busy = touchTour(now) || busy;
 
   const vel = pointerVelocity(now);
   const speed = vel ? Math.hypot(vel.x, vel.y) : 0;
@@ -345,6 +350,7 @@ addEventListener('pointermove', (e) => {
     wake();
     return;
   }
+  if (frozen()) return;
   if (e.pointerType === 'touch') {
     // a finger dragging across the stage leaves haze behind it
     if (!touch.finger) return;
@@ -366,7 +372,7 @@ addEventListener('pointermove', (e) => {
 });
 
 const leave = () => {
-  if (drag) return;
+  if (drag || frozen()) return;
   motion.leave();
   pointer.inside = false;
   trail.length = 0;
@@ -381,7 +387,7 @@ addEventListener('mouseout', (e) => {
 addEventListener('blur', leave);
 
 canvas.addEventListener('pointerdown', (e) => {
-  if (booking.outside(e.clientX, e.clientY)) return;
+  if (booking.outside(e.clientX, e.clientY) || frozen()) return;
   if (overHelmet(e.clientX, e.clientY) && !inLens(e.clientX, e.clientY)) {
     drag = { id: e.pointerId, x: e.clientX, y: e.clientY, t: stamp(e), moved: false };
     canvas.setPointerCapture(e.pointerId);
@@ -456,7 +462,7 @@ function onTap(x, y) {
 }
 
 function onOrientation(e) {
-  if (e.beta == null || e.gamma == null || drag) return;
+  if (e.beta == null || e.gamma == null || drag || frozen()) return;
   if (!touch.tiltBase) touch.tiltBase = { b: e.beta, g: e.gamma };
   const b = touch.tiltBase;
   b.b += (e.beta - b.b) * 0.004; // slowly re-centre on however the phone is held
