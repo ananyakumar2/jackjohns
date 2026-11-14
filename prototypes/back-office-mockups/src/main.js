@@ -113,6 +113,7 @@ function setUi(spec) {
 }
 
 app.addEventListener('click', (e) => {
+  if (e.target.dataset.scrim) { setUi(e.target.dataset.scrim); render(); return; }
   const t = e.target.closest('[data-tab],[data-opt],[data-phone],[data-act],[data-ui]');
   if (!t) return;
   if (t.dataset.tab) return go(t.dataset.tab);
@@ -152,6 +153,7 @@ app.addEventListener('keydown', (e) => {
 
 // Templates and chips that drop text into the reply box.
 app.addEventListener('click', (e) => {
+  if (e.target.dataset.scrim) { setUi(e.target.dataset.scrim); render(); return; }
   const t = e.target.closest('[data-fill]');
   if (!t) return;
   const ta = app.querySelector('form[data-send] textarea');
