@@ -10,7 +10,8 @@ export const OPTIONS = {
 };
 export const ORDER = ['sim', 'track', 'commentating', 'racing'];
 
-export const HOURS = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+// one-hour sim slots from 10:00 to 22:00, the last starting at 21:00 (same as the back office)
+export const HOURS = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
 const DAYS = 42;
 
 export const aed = (n) => `AED ${n.toLocaleString('en-US')}`;

@@ -259,6 +259,7 @@
 .field {
   display: grid;
   gap: 0.8cqi;
+  min-width: 0;
   text-align: left;
 }
 
