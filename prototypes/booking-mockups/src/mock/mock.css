@@ -1,0 +1,406 @@
+/* Booking mockups. Same palette as the hero: Jack's blue, silver and gold chrome on the stage blue. */
+:root {
+  /* the one typeface switch for every booking mockup, emails included */
+  --font: 'Archivo Expanded', system-ui, sans-serif;
+  --gold: #d8b36a;
+  --gold-dim: rgb(216 179 106 / 0.55);
+  --silver: linear-gradient(180deg, #f3f6fa 0%, #a9b2be 46%, #e4e9f0 54%, #7d8693 100%);
+  --gold-chrome: linear-gradient(180deg, #fbe9b8 0%, #b98c3d 46%, #f0cf86 54%, #8e6727 100%);
+  --hair: rgb(198 206 217 / 0.22);
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#lens > [hidden] {
+  display: none !important;
+}
+
+#lens {
+  place-content: stretch;
+}
+
+#portal {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  color: var(--type);
+  font: 600 max(11px, 1.45cqi) / 1 var(--font);
+  letter-spacing: 0.04em;
+}
+
+#portal > * {
+  animation: rise 0.5s var(--ease) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.2cqi) scale(0.985);
+  }
+}
+
+#portal button,
+#portal input,
+#portal textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+#portal button {
+  cursor: pointer;
+}
+
+.up {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.hide-prices .price:not(.ask),
+.hide-prices .price-row {
+  display: none !important;
+}
+
+/* ---------- shared pieces ---------- */
+.back {
+  position: absolute;
+  top: 5.5cqi;
+  left: 50%;
+  z-index: 3;
+  width: 4.2cqi;
+  height: 4.2cqi;
+  min-width: 28px;
+  min-height: 28px;
+  margin-left: max(-2.1cqi, -14px);
+  padding: 0;
+  border: 1px solid var(--hair);
+  border-radius: 50%;
+  background: transparent;
+  transition: border-color 0.25s ease;
+}
+
+.back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 26%;
+  height: 26%;
+  border-left: 1.5px solid var(--type);
+  border-bottom: 1.5px solid var(--type);
+  transform: translateX(15%) rotate(45deg);
+}
+
+.back:hover {
+  border-color: rgb(198 206 217 / 0.7);
+}
+
+.optbar {
+  display: flex;
+  justify-content: center;
+  gap: 0.6cqi;
+  padding: 0.5cqi;
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+}
+
+.optbar button {
+  padding: 1cqi 1.8cqi 0.9cqi;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: max(9.5px, 1.15cqi) !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0.55;
+  transition: opacity 0.2s ease, background-color 0.3s ease;
+}
+
+.optbar button:hover {
+  opacity: 0.9;
+}
+
+.optbar button.on {
+  opacity: 1;
+  background: rgb(47 102 224 / 0.9);
+  color: #eef3fb !important;
+}
+
+.legend {
+  display: flex;
+  gap: 2.4cqi;
+  justify-content: center;
+  font-size: max(9px, 1.05cqi);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9cqi;
+}
+
+.legend span::before {
+  content: '';
+  width: 1.3cqi;
+  height: 1.3cqi;
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 50%;
+}
+
+.legend .free::before {
+  border: 1px solid var(--type);
+}
+
+.legend .held::before {
+  border: 1px dashed var(--gold);
+  background: repeating-linear-gradient(135deg, rgb(216 179 106 / 0.45) 0 2px, transparent 2px 4px);
+}
+
+.legend .booked::before {
+  background: rgb(198 206 217 / 0.22);
+}
+
+/* slot states, shared by every calendar */
+.s {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgb(198 206 217 / 0.45);
+  background: transparent;
+  transition: border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+}
+
+.s::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--blue);
+  clip-path: circle(0 at var(--ix, 50%) var(--iy, 50%));
+  transition: clip-path 0.42s var(--ease);
+}
+
+.s.free:hover {
+  border-color: var(--type);
+}
+
+.s.held {
+  border: 1px dashed var(--gold-dim);
+  color: var(--gold);
+  background: repeating-linear-gradient(135deg, rgb(216 179 106 / 0.13) 0 3px, transparent 3px 7px);
+  cursor: not-allowed !important;
+}
+
+.s.booked {
+  border-color: transparent;
+  background: rgb(198 206 217 / 0.08);
+  color: rgb(198 206 217 / 0.32);
+  cursor: not-allowed !important;
+}
+
+.s.picked {
+  border-color: var(--blue);
+  color: #eef3fb;
+}
+
+.s.picked::before {
+  clip-path: circle(150% at var(--ix, 50%) var(--iy, 50%));
+}
+
+.s.mine {
+  border-style: solid;
+  border-color: var(--gold);
+}
+
+.s.flip {
+  animation: flip 1.4s var(--ease);
+}
+
+@keyframes flip {
+  0% {
+    box-shadow: 0 0 0 0 rgb(216 179 106 / 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 1.4cqi rgb(216 179 106 / 0);
+  }
+}
+
+.cta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 1.5cqi 3.4cqi 1.4cqi;
+  border: 0;
+  border-radius: 999px;
+  background: var(--silver);
+  color: #1b2230 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.2em !important;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4), 0 0.6cqi 2cqi rgb(0 0 0 / 0.3);
+  transition: transform 0.25s var(--ease), opacity 0.25s ease, filter 0.25s ease;
+}
+
+.cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.cta:disabled {
+  opacity: 0.25;
+  cursor: default !important;
+  transform: none;
+  filter: none;
+}
+
+.field {
+  display: grid;
+  gap: 0.8cqi;
+  min-width: 0;
+  text-align: left;
+}
+
+.field > span {
+  font-size: max(9px, 1.05cqi);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1.2cqi 0 1cqi;
+  border: 0;
+  border-bottom: 1px solid rgb(198 206 217 / 0.35);
+  background: transparent;
+  font-size: max(12px, 1.6cqi) !important;
+  letter-spacing: 0.04em !important;
+  outline: none;
+  resize: none;
+  transition: border-color 0.25s ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--blue);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgb(198 206 217 / 0.3);
+}
+
+/* ---------- the email preview, beside the portal ---------- */
+#mail {
+  position: fixed;
+  top: 50%;
+  right: max(18px, 2vw);
+  z-index: 2;
+  width: min(380px, calc(50vw - 47vh - 30px));
+  min-width: 300px;
+  max-height: 86vh;
+  overflow: auto;
+  border-radius: 14px;
+  opacity: 0;
+  transform: translate(24px, -50%);
+  transition: opacity 0.5s ease, transform 0.7s var(--ease);
+  font: 400 12.5px / 1.6 var(--font);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.45);
+}
+
+#mail.shown {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+#mail[hidden] {
+  display: none;
+}
+
+@media (max-aspect-ratio: 4/3) {
+  #mail {
+    top: auto;
+    bottom: 12px;
+    right: 50%;
+    width: min(380px, 92vw);
+    max-height: 40vh;
+    transform: translate(50%, 24px);
+  }
+  #mail.shown {
+    transform: translate(50%, 0);
+  }
+}
+
+/* ---------- switcher (review tool, not part of the design) ---------- */
+#switcher {
+  position: fixed;
+  top: 4px;
+  right: 10px;
+  z-index: 5;
+  display: flex;
+  gap: 10px;
+  font: 600 9px / 1 var(--font);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.38;
+  transition: opacity 0.25s ease;
+}
+
+#switcher:hover,
+#switcher:focus-within {
+  opacity: 1;
+}
+
+#switcher > div {
+  display: flex;
+  gap: 2px;
+}
+
+#switcher [hidden] {
+  display: none;
+}
+
+#switcher button {
+  padding: 5px 8px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--type);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+#switcher button:hover {
+  opacity: 1;
+}
+
+#switcher button.on {
+  opacity: 1;
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+#switcher .prices {
+  margin-left: 8px;
+}
+
+#switcher .prices.off {
+  text-decoration: line-through;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #portal > *,
+  .s,
+  .s::before,
+  #mail {
+    animation: none !important;
+    transition: none !important;
+  }
+}

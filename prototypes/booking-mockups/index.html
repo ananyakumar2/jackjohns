@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#131821" />
+    <title>Jack Johns · Booking</title>
+    <link rel="icon" href="data:," />
+    <link rel="preload" href="content/content.json" as="fetch" crossorigin />
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="stylesheet" href="./src/mock/mock.css" />
+  </head>
+  <body>
+    <main id="stage">
+      <canvas id="gl" aria-hidden="true"></canvas>
+      <h1 id="title">Jack Johns</h1>
+      <nav id="pillars" aria-label="Pillars"></nav>
+      <button id="book" type="button" aria-expanded="false" aria-controls="lens">Book</button>
+      <section id="lens" hidden aria-label="Booking">
+        <p class="lens-name" hidden></p>
+        <ul class="lens-slots" hidden></ul>
+        <div id="portal"></div>
+      </section>
+      <aside id="mail" hidden aria-label="Email"></aside>
+    </main>
+    <details id="credits">
+      <summary>Credits</summary>
+      <ul>
+        <li>Helmet: <a href="https://sketchfab.com/3d-models/f1-helmet-zhouguanyu-24-1124fa1f754645d7b9d54de84009d463" target="_blank" rel="noopener">“F1 Helmet ZhouGuanyu 24”</a> by Miopass, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>, modified</li>
+        <li>Racing: <a href="https://commons.wikimedia.org/wiki/File:2023_TCR_World_Tour_at_El_Pinar_-_Afternoon_race_Video_01.webm" target="_blank" rel="noopener">“2023 TCR World Tour at El Pinar”</a> by NaBUru38, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>, trimmed</li>
+        <li>Sim racing: Tima Miroshnichenko, Pexels. Commentating, coaching: Mixkit</li>
+        <li>Type: Archivo by Omnibus-Type, SIL OFL</li>
+      </ul>
+    </details>
+    <nav id="switcher" aria-label="Mockups"></nav>
+    <script type="module" src="./src/mock/main.js"></script>
+  </body>
+</html>
