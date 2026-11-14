@@ -127,13 +127,18 @@ app.addEventListener('click', (e) => {
   if (t.dataset.act) {
     e.stopPropagation();
     const [act, id] = t.dataset.act.split(':');
+    let say = t.dataset.say;
     if (act === 'quote') {
-      const v = prompt('Quote in AED', '8000');
+      const field = t.dataset.amountFrom && app.querySelector(t.dataset.amountFrom);
+      const v = field ? field.value : prompt('Quote in AED', '8000');
       const n = Number(String(v || '').replace(/[^\d]/g, ''));
-      if (n) actions.quote(id, n);
-      return;
+      if (!n) return;
+      actions.quote(id, n);
+      if (say) say = say.replace('{amount}', n.toLocaleString('en-GB'));
+    } else if (act !== 'none') {
+      actions[act](id);
     }
-    actions[act](id);
+    if (say && t.dataset.thread) actions.send(t.dataset.thread, say);
   }
 });
 
