@@ -97,12 +97,16 @@ const ctx = {
     if (state.stage === 'portal') setProtected(false);
     show();
   },
-  send(details) {
+  send(details, { rerender = true } = {}) {
     state.details = details;
     state.sent = true;
     setProtected(false);
     if (state.slot && OPTIONS[state.option].kind === 'book') hold(state.slot.day, state.option === 'sim' ? state.slot.h : null);
+    if (rerender) show();
     showMail();
+  },
+  close() {
+    globalThis.redlineHooks.booking?.close();
   },
   restart() {
     hideMail();
